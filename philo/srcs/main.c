@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/22 20:47:42 by bsengeze          #+#    #+#             */
+/*   Updated: 2023/08/22 20:47:44 by bsengeze         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 
 //allocate memory for philosophers, forks, and args
@@ -36,7 +48,6 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 	sim_params->time_to_die = ft_atoi(argv[2]);
 	sim_params->time_to_eat = ft_atoi(argv[3]);
 	sim_params->time_to_sleep = ft_atoi(argv[4]);
-	// sim_params->death_state = EVERYONE_ALIVE;
 	sim_params->total_meals_to_be_eaten = sim_params->number_of_philosophers
 		* sim_params->number_of_times_each_philo_must_eat;
 	if (gettimeofday(&sim_params->start_time, NULL) == -1)
@@ -64,7 +75,6 @@ void	init_philosophers_and_forks(t_simulation_parameters *sim_params, int i)
 	sim_params->philosophers[i].last_meal_timestamp
 		= current_timestamp(sim_params->start_time);
 	sim_params->philosophers[i].meals_eaten = 0;
-	// sim_params->forks[i].state = FREE;
 	sim_params->forks[i].id = i + 1;
 	if (pthread_mutex_init(&sim_params->forks[i].mutex_fork, NULL))
 		print_exit("Error: pthread_mutex_init failed\n");
@@ -75,8 +85,9 @@ void	simulation(t_simulation_parameters *sim_params)
 	long long	i;
 
 	i = -1;
-	if (pthread_create(&sim_params->monitor_thread, NULL, monitor_death, sim_params->args))
-    	print_exit("Error: pthread_create for monitor thread failed\n");
+	if (pthread_create(&sim_params->monitor_thread, NULL,
+			monitor_death, sim_params->args))
+		print_exit("Error: pthread_create for monitor thread failed\n");
 	while (++i < sim_params->number_of_philosophers)
 	{
 		init_philosophers_and_forks(sim_params, i);
@@ -94,34 +105,7 @@ void	simulation(t_simulation_parameters *sim_params)
 			print_exit("Error: pthread_join failed\n");
 	}
 	if (pthread_join(sim_params->monitor_thread, NULL))
-        print_exit("Error: pthread_join for monitor thread failed\n");
-}
-
-void *monitor_death(void *arg) 
-{
-    t_philosopher_args	*args;
-	long long i;
-
-	args = (t_philosopher_args *)arg;
-    while (1) 
-	{
-		i = 0;
-		while (i < args->sim_params->number_of_philosophers)
-		{
-       		if (current_timestamp(args->sim_params->start_time)
-				- args->philosopher[i].last_meal_timestamp
-				>= args->sim_params->time_to_die)
-			{
-				args->philosopher[i].state = DIED;
-				// args->sim_params->death_state = SOMEONE_DIED;
-				print_state(args, DIED);
-			}
-			i++;
-		}
-		if (args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
-			break;
-    }
-	return (NULL);
+		print_exit("Error: pthread_join for monitor thread failed\n");
 }
 
 int	main(int argc, char **argv)
@@ -135,6 +119,5 @@ int	main(int argc, char **argv)
 	if (sim_params.hunger_check == ON
 		&& sim_params.hunger_state == PHILOSOPHERS_ARE_FULL)
 		printf("Everyone ate enough\n");
-	// printf("%lld Exiting program\n", current_timestamp(sim_params.start_time));
 	return (0);
 }

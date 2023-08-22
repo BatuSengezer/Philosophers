@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/22 21:55:11 by bsengeze          #+#    #+#             */
+/*   Updated: 2023/08/22 21:55:14 by bsengeze         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 
 void	input_check(int argc, char **argv)
@@ -43,24 +55,33 @@ void	handle_single_philosopher_case(t_philosopher_args *args)
 	usleep(args->sim_params->time_to_die * 1000);
 	printf("%lld %d died\n", current_timestamp(args->sim_params->start_time),
 		args->philosopher->id);
-	// args->sim_params->death_state = 1;
 }
 
-// int	check_death(t_philosopher_args *args)
-// {
-// 	if (current_timestamp(args->sim_params->start_time)
-// 		- args->philosopher->last_meal_timestamp
-// 		>= args->sim_params->time_to_die)
-// 	{
-// 		args->philosopher->state = DIED;
-// 		args->sim_params->death_state = SOMEONE_DIED;
-// 		print_state(args, DIED);
-// 		return (1);
-// 	}
-// 	if (args->sim_params->death_state == SOMEONE_DIED)
-// 		return (1);
-// 	return (0);
-// }
+void	*monitor_death(void *arg)
+{
+	t_philosopher_args	*args;
+	long long			i;
+
+	args = (t_philosopher_args *)arg;
+	while (1) 
+	{
+		i = 0;
+		while (i < args->sim_params->number_of_philosophers)
+		{
+			if (current_timestamp(args->sim_params->start_time)
+				- args->philosopher[i].last_meal_timestamp
+				>= args->sim_params->time_to_die)
+			{
+				args->philosopher[i].state = DIED;
+				print_state(args, DIED);
+			}
+			i++;
+		}
+		if (args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
+			break ;
+	}
+	return (NULL);
+}
 
 long long	ft_atoi(const char *nptr)
 {

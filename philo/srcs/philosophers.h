@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers.h                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/22 20:48:05 by bsengeze          #+#    #+#             */
+/*   Updated: 2023/08/22 20:48:08 by bsengeze         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILOSOPHERS_H
 # define PHILOSOPHERS_H
 
@@ -17,18 +29,6 @@ typedef enum e_philosopher_state
 	DIED
 }							t_philosopher_state;
 
-// typedef enum e_fork_state
-// {
-// 	FREE,
-// 	IN_USE
-// }							t_fork_state;
-
-// typedef enum e_death_state
-// {
-// 	EVERYONE_ALIVE = 0,
-// 	SOMEONE_DIED
-// }							t_death_state;
-
 typedef enum e_hunger_state
 {
 	PHILOSOPHERS_NOT_FULL_YET = 0,
@@ -43,7 +43,6 @@ typedef enum e_hunger_check
 typedef struct s_fork
 {
 	int						id;
-	// t_fork_state			state;
 	pthread_mutex_t			mutex_fork;
 }							t_fork;
 
@@ -59,8 +58,6 @@ typedef struct s_philosopher
 
 }							t_philosopher;
 
-// forward decleration so that we can use it in the struct before defining it
-
 struct								s_philosopher_args;
 typedef struct s_philosopher_args	t_philosopher_args;
 
@@ -71,7 +68,6 @@ typedef struct s_simulation_parameters
 	int						time_to_eat;
 	int						time_to_sleep;
 	struct timeval			start_time;
-	// t_death_state			death_state;
 	int						number_of_times_each_philo_must_eat;
 	int						total_meals_to_be_eaten;
 	int						total_meals_eaten;
