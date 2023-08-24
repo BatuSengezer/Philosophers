@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 21:55:11 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/22 21:55:14 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 14:21:37 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,11 @@ void	*monitor_death(void *arg)
 		while (i < args->sim_params->number_of_philosophers)
 		{
 			if (current_timestamp(args->sim_params->start_time)
-				- args->philosopher[i].last_meal_timestamp
+				- args->philosopher->last_meal_timestamp
 				>= args->sim_params->time_to_die)
 			{
-				args->philosopher[i].state = DIED;
-				print_state(args, DIED);
+				args->philosopher->state = DIED;
+				print_state(&args[i], DIED);
 			}
 			i++;
 		}
