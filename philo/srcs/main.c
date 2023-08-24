@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:47:42 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 19:50:37 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 23:37:18 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,9 +90,6 @@ void	simulation(t_simulation_parameters *sim_params)
 	long long	i;
 
 	i = -1;
-	if (pthread_create(&sim_params->monitor_thread, NULL,
-			monitor_death, sim_params->args))
-		print_exit("Error: pthread_create for monitor thread failed\n");
 	while (++i < sim_params->number_of_philosophers)
 	{
 		init_philosophers_and_forks(sim_params, i);
@@ -106,11 +103,22 @@ void	simulation(t_simulation_parameters *sim_params)
 	i = -1;
 	while (++i < sim_params->number_of_philosophers)
 	{
+		if (pthread_create(&sim_params->philosophers[i].monitor_thread, NULL,
+				monitor_death, &sim_params->args[i]))
+			print_exit("Error: pthread_create failed\n");
+	}
+	i = -1;
+	while (++i < sim_params->number_of_philosophers)
+	{
 		if (pthread_join(sim_params->philosophers[i].p_thread, NULL))
 			print_exit("Error: pthread_join failed\n");
 	}
-	if (pthread_join(sim_params->monitor_thread, NULL))
-		print_exit("Error: pthread_join for monitor thread failed\n");
+	i = -1;
+	while (++i < sim_params->number_of_philosophers)
+	{
+		if (pthread_join(sim_params->philosophers[i].monitor_thread, NULL))
+			print_exit("Error: pthread_join failed\n");
+	}
 }
 
 int	main(int argc, char **argv)

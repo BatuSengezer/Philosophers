@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 21:34:08 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 23:22:28 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,9 @@ void	eat(t_philosopher_args	*args)
 {
 	pick_up_forks(args);
 	pthread_mutex_lock(&args->philosopher->meal_mutex);
-	args->philosopher->state = EATING;
+	// args->philosopher->state = EATING;
+	args->philosopher->last_meal_timestamp = current_timestamp(
+			args->sim_params->start_time);
 	if (args->sim_params->hunger_check == ON)
 	{
 		args->philosopher->meals_eaten++;
@@ -76,8 +78,6 @@ void	eat(t_philosopher_args	*args)
 			->total_meals_to_be_eaten)
 			args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
 	}
-	args->philosopher->last_meal_timestamp = current_timestamp(
-			args->sim_params->start_time);
 	print_state(args, EATING);
 	usleep(args->sim_params->time_to_eat * 1000);
 	pthread_mutex_unlock(&args->philosopher->meal_mutex);
@@ -95,9 +95,11 @@ void	*eat_sleep_think(void *arg)
 		return (NULL);
 	}
 	pthread_mutex_lock(&args->sim_params->death_mutex);
-	while (args->philosopher->death_state== EVERYONE_ALIVE)
+	while (args->philosopher->death_state== EVERYONE_ALIVE 
+		&& 	args->sim_params->hunger_state == PHILOSOPHERS_NOT_FULL_YET)
 	{
 		pthread_mutex_unlock(&args->sim_params->death_mutex);
+		print_state(args, THINKING);
 		eat(args);
 		// added drop fork for even and odd
 		if (args->philosopher->id % 2 == 1)
@@ -120,9 +122,8 @@ void	*eat_sleep_think(void *arg)
 		usleep(args->sim_params->time_to_sleep * 1000);
 		// args->philosopher->state = THINKING;
 		// print_state(args, THINKING);
-				print_state(args, THINKING);
-		// pthread_mutex_lock(&args->sim_params->death_mutex);
+		pthread_mutex_lock(&args->sim_params->death_mutex);
 	}
-	// pthread_mutex_unlock(&args->sim_params->death_mutex);
+	pthread_mutex_unlock(&args->sim_params->death_mutex);
 	return (NULL);
 }

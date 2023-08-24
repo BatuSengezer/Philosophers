@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:48:05 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 19:50:22 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 23:00:55 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ typedef struct s_philosopher
 {
 	int						id;
 	pthread_t				p_thread;
+	pthread_t				monitor_thread;
 	pthread_mutex_t			meal_mutex;
 	t_philosopher_state		state;
 	t_fork					*fork_right;
@@ -85,7 +86,6 @@ typedef struct s_simulation_parameters
 	t_fork					*forks;
 	pthread_mutex_t			print_mutex;
 	pthread_mutex_t			death_mutex;
-	pthread_t				monitor_thread;
 	t_philosopher_args		*args;
 }							t_simulation_parameters;
 
