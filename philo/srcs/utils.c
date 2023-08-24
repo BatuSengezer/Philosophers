@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 21:55:11 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/22 21:55:14 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 14:03:21 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ long long	current_timestamp(struct timeval start_time)
 
 void	handle_single_philosopher_case(t_philosopher_args *args)
 {
+	printf("%lld %d is thinking\n",
+		current_timestamp(args->sim_params->start_time), args->philosopher->id);
 	printf("%lld %d has taken a fork\n",
 		current_timestamp(args->sim_params->start_time), args->philosopher->id);
 	usleep(args->sim_params->time_to_die * 1000);
@@ -61,24 +63,48 @@ void	*monitor_death(void *arg)
 {
 	t_philosopher_args	*args;
 	long long			i;
+	long long			j;
 
 	args = (t_philosopher_args *)arg;
 	while (1) 
 	{
-		i = 0;
-		while (i < args->sim_params->number_of_philosophers)
-		{
+		i = -1;
+		// while (i < args->sim_params->number_of_philosophers)
+		// {
+			// printf("here\n");
+			pthread_mutex_lock(&args->philosopher->last_meal_mutex);
 			if (current_timestamp(args->sim_params->start_time)
-				- args->philosopher[i].last_meal_timestamp
-				>= args->sim_params->time_to_die)
+				- args->philosopher->last_meal_timestamp
+				>= args->sim_params->time_to_die && args->philosopher->state != EATING)
+			// if (current_timestamp(args->sim_params->start_time)
+			// 	- args[i].philosopher->last_meal_timestamp
+			// 	>= args[i].sim_params->time_to_die)
 			{
-				args->philosopher[i].state = DIED;
-				print_state(args, DIED);
+			j = 0;
+			while (j < args->sim_params->number_of_philosophers)
+			{
+				printf("last_meal_timestamp of %lld: %lld\n",j+1, args->sim_params->philosophers[j].last_meal_timestamp);
+				j++;
 			}
-			i++;
-		}
+				// args->philosopher[i].state = DIED;
+				// print_state(args, DIED);
+
+				//check here
+				args->philosopher->state = DIED;
+				print_state(args, DIED);
+				pthread_mutex_lock(&args->sim_params->death_mutex);
+				while (++i < args->sim_params->number_of_philosophers)
+					args->sim_params->philosophers[i].death_state = SOMEONE_DIED;
+				pthread_mutex_unlock(&args->sim_params->death_mutex);
+				pthread_mutex_unlock(&args->philosopher->last_meal_mutex);
+				return (NULL);
+			}
+			pthread_mutex_unlock(&args->philosopher->last_meal_mutex);
+			// i++;
+		// }
 		if (args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
 			break ;
+		// usleep(1000);
 	}
 	return (NULL);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:48:05 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/22 20:48:08 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 12:39:52 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,12 @@ typedef enum e_hunger_state
 	PHILOSOPHERS_ARE_FULL
 }							t_hunger_state;
 
+typedef enum death_state_e
+{
+	EVERYONE_ALIVE = 0,
+	SOMEONE_DIED
+}							t_death_state;
+
 typedef enum e_hunger_check
 {
 	ON = 0,
@@ -55,7 +61,9 @@ typedef struct s_philosopher
 	t_fork					*fork_left;
 	long long				last_meal_timestamp;
 	int						meals_eaten;
-
+	pthread_mutex_t			last_meal_mutex;
+	pthread_t				monitor_thread;
+	t_death_state			death_state;
 }							t_philosopher;
 
 struct								s_philosopher_args;
@@ -76,7 +84,7 @@ typedef struct s_simulation_parameters
 	t_philosopher			*philosophers;
 	t_fork					*forks;
 	pthread_mutex_t			print_mutex;
-	pthread_t				monitor_thread;
+	pthread_mutex_t			death_mutex;
 	t_philosopher_args		*args;
 }							t_simulation_parameters;
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 21:55:24 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/22 21:55:26 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 12:19:18 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	destroy_free(t_simulation_parameters *sim_params)
 			print_exit("Error: pthread_mutex_destroy failed\n ");
 		i++;
 	}
-	free(sim_params->philosophers);
-	free(sim_params->forks);
-	free(sim_params->args);
+	// free(sim_params->philosophers);
+	// free(sim_params->forks);
+	// free(sim_params->args);
 }

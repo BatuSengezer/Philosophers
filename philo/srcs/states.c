@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   states.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/22 20:51:33 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 14:04:48 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,33 @@
 
 void	print_state(t_philosopher_args *args, t_philosopher_state state)
 {
-	if (pthread_mutex_lock(args->print_mutex))
-		print_exit("Error: could not lock print mutex\n");
-	printf("%lld %d ", current_timestamp(args->sim_params->start_time),
+	pthread_mutex_lock(&args->sim_params->death_mutex);
+	pthread_mutex_lock(args->print_mutex);
+	// printf("%lld %d ", current_timestamp(args->sim_params->start_time),
+	// 	args->philosopher->id);
+	if (state == EATING && args->philosopher->death_state != SOMEONE_DIED)
+		printf("%lld %d is eating\n", current_timestamp(args->sim_params->start_time),
 		args->philosopher->id);
-	if (state == EATING)
-		printf("is eating\n");
-	else if (state == SLEEPING)
-		printf("is sleeping\n");
-	else if (state == THINKING)
-		printf("is thinking\n");
-	else if (state == DIED)
+	else if (state == SLEEPING && args->philosopher->death_state != SOMEONE_DIED)
+		printf("%lld %d is sleeping\n", current_timestamp(args->sim_params->start_time),
+		args->philosopher->id);
+	else if (state == THINKING && args->philosopher->death_state != SOMEONE_DIED)
+		printf("%lld %d is thinking\n", current_timestamp(args->sim_params->start_time),
+		args->philosopher->id);
+	else if (state == DIED && args->philosopher->death_state != SOMEONE_DIED)
 	{
-		printf("died\n");
-		exit(1);
+		printf("%lld %d died\n", current_timestamp(args->sim_params->start_time),
+		args->philosopher->id);
+		// exit (1);
 	}
-	else if (state == HAS_FORK)
-		printf("has taken a fork\n");
-	else if (state == HAS_FORKS)
-		printf("has taken a fork\n");
-	if (pthread_mutex_unlock(args->print_mutex))
-		print_exit("Error: could not unlock print mutex\n");
+	else if (state == HAS_FORK && args->philosopher->death_state != SOMEONE_DIED)
+		printf("%lld %d has taken a fork\n", current_timestamp(args->sim_params->start_time),
+		args->philosopher->id);
+	else if (state == HAS_FORKS && args->philosopher->death_state != SOMEONE_DIED)
+		printf("%lld %d has taken a fork\n", current_timestamp(args->sim_params->start_time),
+		args->philosopher->id);
+	pthread_mutex_unlock(args->print_mutex);
+	pthread_mutex_unlock(&args->sim_params->death_mutex);
 }
 
 int	pick_up_forks(t_philosopher_args *args)
@@ -62,10 +68,14 @@ int	pick_up_forks(t_philosopher_args *args)
 
 void	eat(t_philosopher_args	*args)
 {
-	long long	i;
+	// long long	i;
 
-	i = 0;
+	// i = 0;
+	// if (current_timestamp(
+	// 		args->sim_params->start_time) - args->philosopher->last_meal_timestamp < args->sim_params->time_to_eat +args->sim_params->time_to_sleep + 10)
+	// 	usleep(500);
 	pick_up_forks(args);
+	pthread_mutex_lock(&args->philosopher->last_meal_mutex);
 	args->philosopher->state = EATING;
 	if (args->sim_params->hunger_check == ON)
 	{
@@ -73,20 +83,21 @@ void	eat(t_philosopher_args	*args)
 		args->sim_params->total_meals_eaten++;
 		if (args->sim_params->total_meals_eaten >= args->sim_params
 			->total_meals_to_be_eaten)
-		{
-			while (args->philosopher[i].meals_eaten >= 
-				args->sim_params->number_of_times_each_philo_must_eat)
-			{
-				i++;
-				if (i == args->sim_params->number_of_philosophers)
 					args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
-			}
-		}
 	}
 	args->philosopher->last_meal_timestamp = current_timestamp(
 			args->sim_params->start_time);
 	print_state(args, EATING);
 	usleep(args->sim_params->time_to_eat * 1000);
+	pthread_mutex_unlock(&args->philosopher->last_meal_mutex);
+	if (args->philosopher->id % 2 == 0)
+		if (pthread_mutex_unlock(&args->philosopher->fork_left->mutex_fork) 
+			|| pthread_mutex_unlock(&args->philosopher->fork_right->mutex_fork))
+			print_exit("Error: could not unlock fork mutex\n");
+	if (args->philosopher->id % 2 == 1)
+		if (pthread_mutex_unlock(&args->philosopher->fork_right->mutex_fork) 
+			|| pthread_mutex_unlock(&args->philosopher->fork_left->mutex_fork))
+			print_exit("Error: could not unlock fork mutex\n");
 }
 
 void	*eat_sleep_think(void *arg)
@@ -94,26 +105,29 @@ void	*eat_sleep_think(void *arg)
 	t_philosopher_args		*args;
 
 	args = (t_philosopher_args *)arg;
-	print_state(args, args->philosopher->state);
 	if (args->sim_params->number_of_philosophers == 1)
 	{
 		handle_single_philosopher_case(args);
 		return (NULL);
 	}
-	while (1)
+	// print_state(args, args->philosopher->state);
+	pthread_mutex_lock(&args->sim_params->death_mutex);
+	while (args->philosopher->death_state != SOMEONE_DIED && args->sim_params
+		->hunger_state != PHILOSOPHERS_ARE_FULL)
 	{
-		eat(args);
-		if (pthread_mutex_unlock(&args->philosopher->fork_right->mutex_fork) 
-			|| pthread_mutex_unlock(&args->philosopher->fork_left->mutex_fork))
-			print_exit("Error: could not unlock fork mutex\n");
+		pthread_mutex_unlock(&args->sim_params->death_mutex);
+		args->philosopher->state = THINKING;
+		print_state(args, THINKING);
+		if (args->philosopher->death_state != SOMEONE_DIED)
+			eat(args);
 		if (args->sim_params->hunger_check == ON
 			&& args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
 			break ;
 		args->philosopher->state = SLEEPING;
 		print_state(args, SLEEPING);
 		usleep(args->sim_params->time_to_sleep * 1000);
-		args->philosopher->state = THINKING;
-		print_state(args, THINKING);
+		pthread_mutex_lock(&args->sim_params->death_mutex);
 	}
+	pthread_mutex_unlock(&args->sim_params->death_mutex);
 	return (NULL);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:47:42 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/22 20:47:44 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 12:43:13 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,16 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 	allocate(sim_params);
 	if (pthread_mutex_init(&sim_params->print_mutex, NULL))
 		print_exit("Error: pthread_mutex_init failed\n");
+	if (pthread_mutex_init(&sim_params->death_mutex, NULL))
+		print_exit("Error: pthread_mutex_init failed\n");
 }
 
 void	init_philosophers_and_forks(t_simulation_parameters *sim_params, int i)
 {
+	pthread_mutex_init(&sim_params->philosophers[i].last_meal_mutex, NULL);
 	sim_params->philosophers[i].id = i + 1;
 	sim_params->philosophers[i].state = THINKING;
+	sim_params->philosophers[i].death_state = EVERYONE_ALIVE;
 	if (i == 0)
 	{
 		sim_params->philosophers[i].fork_left = &sim_params->forks[i];
@@ -85,9 +89,6 @@ void	simulation(t_simulation_parameters *sim_params)
 	long long	i;
 
 	i = -1;
-	if (pthread_create(&sim_params->monitor_thread, NULL,
-			monitor_death, sim_params->args))
-		print_exit("Error: pthread_create for monitor thread failed\n");
 	while (++i < sim_params->number_of_philosophers)
 	{
 		init_philosophers_and_forks(sim_params, i);
@@ -97,15 +98,18 @@ void	simulation(t_simulation_parameters *sim_params)
 		if (pthread_create(&sim_params->philosophers[i].p_thread, NULL,
 				eat_sleep_think, &sim_params->args[i]))
 			print_exit("Error: pthread_create failed\n");
+		if (pthread_create(&sim_params->philosophers[i].monitor_thread, NULL,
+			monitor_death, &sim_params->args[i]))
+			print_exit("Error: pthread_create for monitor thread failed\n");
 	}
+	
 	i = -1;
 	while (++i < sim_params->number_of_philosophers)
 	{
 		if (pthread_join(sim_params->philosophers[i].p_thread, NULL))
 			print_exit("Error: pthread_join failed\n");
 	}
-	if (pthread_join(sim_params->monitor_thread, NULL))
-		print_exit("Error: pthread_join for monitor thread failed\n");
+	pthread_join(sim_params->philosophers[i].monitor_thread, NULL);
 }
 
 int	main(int argc, char **argv)
