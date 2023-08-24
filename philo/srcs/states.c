@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 19:59:12 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 21:34:08 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,14 +95,23 @@ void	*eat_sleep_think(void *arg)
 		return (NULL);
 	}
 	pthread_mutex_lock(&args->sim_params->death_mutex);
-	while (1)
+	while (args->philosopher->death_state== EVERYONE_ALIVE)
 	{
 		pthread_mutex_unlock(&args->sim_params->death_mutex);
-		print_state(args, THINKING);
 		eat(args);
-		if (pthread_mutex_unlock(&args->philosopher->fork_right->mutex_fork) 
-			|| pthread_mutex_unlock(&args->philosopher->fork_left->mutex_fork))
-			print_exit("Error: could not unlock fork mutex\n");
+		// added drop fork for even and odd
+		if (args->philosopher->id % 2 == 1)
+			if (pthread_mutex_unlock(&args->philosopher->fork_right->mutex_fork) 
+				|| pthread_mutex_unlock(&args->philosopher->fork_left->mutex_fork))
+				print_exit("Error: could not unlock fork mutex\n");
+		if (args->philosopher->id % 2 == 0)
+			if (pthread_mutex_unlock(&args->philosopher->fork_left->mutex_fork) 
+				|| pthread_mutex_unlock(&args->philosopher->fork_right->mutex_fork))
+				print_exit("Error: could not unlock fork mutex\n");
+		// if (pthread_mutex_unlock(&args->philosopher->fork_right->mutex_fork) 
+		// 	|| pthread_mutex_unlock(&args->philosopher->fork_left->mutex_fork))
+		// 	print_exit("Error: could not unlock fork mutex\n");
+
 		if (args->sim_params->hunger_check == ON
 			&& args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
 			break ;
@@ -111,8 +120,9 @@ void	*eat_sleep_think(void *arg)
 		usleep(args->sim_params->time_to_sleep * 1000);
 		// args->philosopher->state = THINKING;
 		// print_state(args, THINKING);
-		pthread_mutex_lock(&args->sim_params->death_mutex);
+				print_state(args, THINKING);
+		// pthread_mutex_lock(&args->sim_params->death_mutex);
 	}
-	pthread_mutex_unlock(&args->sim_params->death_mutex);
+	// pthread_mutex_unlock(&args->sim_params->death_mutex);
 	return (NULL);
 }

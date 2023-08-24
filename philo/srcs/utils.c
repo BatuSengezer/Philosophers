@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 21:55:11 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 20:41:54 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 21:01:22 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,13 @@ void	*monitor_death(void *arg)
 		while (i < args->sim_params->number_of_philosophers)
 		{
 			//maybe problem here mutex lock
+			// printf("last meal time stamp before lock %lld\n", args->sim_params->philosophers[i].last_meal_timestamp);
 			pthread_mutex_lock(&args->sim_params->philosophers[i].meal_mutex);
 			if (current_timestamp(args->sim_params->start_time)
-				- args->philosopher->last_meal_timestamp
+				- args->sim_params->philosophers[i].last_meal_timestamp
 				>= args->sim_params->time_to_die)
 			{
+				printf("last meal time stamp after lock %lld\n", args->sim_params->philosophers[i].last_meal_timestamp);
 				args->philosopher->state = DIED;
 				print_state(&args[i], DIED);
 				pthread_mutex_lock(&args->sim_params->death_mutex);
