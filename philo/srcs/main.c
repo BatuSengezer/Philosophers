@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:47:42 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/22 20:47:44 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 19:21:25 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,10 +55,14 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 	allocate(sim_params);
 	if (pthread_mutex_init(&sim_params->print_mutex, NULL))
 		print_exit("Error: pthread_mutex_init failed\n");
+	if (pthread_mutex_init(&sim_params->death_mutex, NULL))
+		print_exit("Error: pthread_mutex_init failed\n");
 }
 
 void	init_philosophers_and_forks(t_simulation_parameters *sim_params, int i)
 {
+	if (pthread_mutex_init(&sim_params->philosophers[i].meal_mutex, NULL))
+		print_exit("Error: pthread_mutex_init failed\n");
 	sim_params->philosophers[i].id = i + 1;
 	sim_params->philosophers[i].state = THINKING;
 	if (i == 0)

@@ -36,3 +36,8 @@ check visualizer with the output
 https://nafuka11.github.io/philosophers-visualizer/
 
 eating takes more then 200 ms
+
+
+
+New
+12)Make philos even and odd leave forks in order

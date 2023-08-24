@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 21:55:11 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 14:21:37 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 19:16:43 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,15 +68,20 @@ void	*monitor_death(void *arg)
 		i = 0;
 		while (i < args->sim_params->number_of_philosophers)
 		{
+			//maybe problem here mutex lock
+			pthread_mutex_lock(&args->philosopher->meal_mutex);
 			if (current_timestamp(args->sim_params->start_time)
 				- args->philosopher->last_meal_timestamp
 				>= args->sim_params->time_to_die)
 			{
 				args->philosopher->state = DIED;
 				print_state(&args[i], DIED);
+				//can do death_check everyone is alive
 			}
+			pthread_mutex_unlock(&args->philosopher->meal_mutex);
 			i++;
 		}
+		// might need to add a mutex unlock here in if and after while loop
 		if (args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
 			break ;
 	}

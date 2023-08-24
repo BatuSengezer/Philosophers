@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:48:05 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/22 20:48:08 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 19:21:30 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ typedef struct s_philosopher
 {
 	int						id;
 	pthread_t				p_thread;
+	pthread_mutex_t			meal_mutex;
 	t_philosopher_state		state;
 	t_fork					*fork_right;
 	t_fork					*fork_left;
@@ -76,6 +77,7 @@ typedef struct s_simulation_parameters
 	t_philosopher			*philosophers;
 	t_fork					*forks;
 	pthread_mutex_t			print_mutex;
+	pthread_mutex_t			death_mutex;
 	pthread_t				monitor_thread;
 	t_philosopher_args		*args;
 }							t_simulation_parameters;
