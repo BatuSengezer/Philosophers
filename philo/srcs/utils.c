@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 21:55:11 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 19:16:43 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 19:54:40 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,9 @@ void	*monitor_death(void *arg)
 {
 	t_philosopher_args	*args;
 	long long			i;
-
+	long long			j;
 	args = (t_philosopher_args *)arg;
-	while (1) 
+	while (1)
 	{
 		i = 0;
 		while (i < args->sim_params->number_of_philosophers)
@@ -76,7 +76,12 @@ void	*monitor_death(void *arg)
 			{
 				args->philosopher->state = DIED;
 				print_state(&args[i], DIED);
+				pthread_mutex_lock(&args->sim_params->death_mutex);
+				j = -1;
+				while (++j < args->sim_params->number_of_philosophers)
+					args->sim_params->philosophers[j].death_state = SOMEONE_DIED;
 				//can do death_check everyone is alive
+				pthread_mutex_unlock(&args->sim_params->death_mutex);
 			}
 			pthread_mutex_unlock(&args->philosopher->meal_mutex);
 			i++;

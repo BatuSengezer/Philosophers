@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:47:42 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 19:21:25 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 19:50:37 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ void	init_philosophers_and_forks(t_simulation_parameters *sim_params, int i)
 		print_exit("Error: pthread_mutex_init failed\n");
 	sim_params->philosophers[i].id = i + 1;
 	sim_params->philosophers[i].state = THINKING;
+	sim_params->philosophers[i].death_state = EVERYONE_ALIVE;
 	if (i == 0)
 	{
 		sim_params->philosophers[i].fork_left = &sim_params->forks[i];

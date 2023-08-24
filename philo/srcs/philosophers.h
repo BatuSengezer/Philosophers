@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:48:05 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 19:21:30 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 19:50:22 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,12 @@ typedef enum e_philosopher_state
 	THINKING,
 	DIED
 }							t_philosopher_state;
+
+typedef enum death_state_e
+{
+	EVERYONE_ALIVE = 0,
+	SOMEONE_DIED
+}							t_death_state;
 
 typedef enum e_hunger_state
 {
@@ -56,6 +62,7 @@ typedef struct s_philosopher
 	t_fork					*fork_left;
 	long long				last_meal_timestamp;
 	int						meals_eaten;
+	t_death_state			death_state;
 
 }							t_philosopher;
 

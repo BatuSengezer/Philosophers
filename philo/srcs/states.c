@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 19:22:21 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/24 19:59:12 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,28 +65,16 @@ int	pick_up_forks(t_philosopher_args *args)
 
 void	eat(t_philosopher_args	*args)
 {
-	long long	i;
-
-	i = 0;
 	pick_up_forks(args);
 	pthread_mutex_lock(&args->philosopher->meal_mutex);
 	args->philosopher->state = EATING;
-	//remove extra while loop
 	if (args->sim_params->hunger_check == ON)
 	{
 		args->philosopher->meals_eaten++;
 		args->sim_params->total_meals_eaten++;
 		if (args->sim_params->total_meals_eaten >= args->sim_params
 			->total_meals_to_be_eaten)
-		{
-			while (args->philosopher[i].meals_eaten >= 
-				args->sim_params->number_of_times_each_philo_must_eat)
-			{
-				i++;
-				if (i == args->sim_params->number_of_philosophers)
-					args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
-			}
-		}
+			args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
 	}
 	args->philosopher->last_meal_timestamp = current_timestamp(
 			args->sim_params->start_time);
