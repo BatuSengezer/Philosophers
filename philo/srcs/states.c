@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/25 14:06:43 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/25 14:35:47 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ void	*monitor_death(void *arg)
 				//can do death_check everyone is alive
 				pthread_mutex_unlock(&args->sim_params->death_mutex);
 				//test without usleep(70) to see if it increases efficiency;
-				usleep(70);
+				// usleep(70);
 				pthread_mutex_unlock(&args->philosopher->meal_mutex);
 				return (NULL);
 			}

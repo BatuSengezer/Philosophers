@@ -13,7 +13,7 @@ while [[ $attempt -le $max_attempts ]]; do
     echo "Running attempt $attempt..."
 
     # Start the program and use tee to output both to terminal and to a file
-    stdbuf -oL ../philo $numbers_of_philosophers $time_to_die $time_to_eat $time_to_sleep 2>&1 | tee philo_output.txt &
+    stdbuf -oL /Users/batu/Desktop/programming/42_core_curr/my_philosophers/philo/philo $numbers_of_philosophers $time_to_die $time_to_eat $time_to_sleep 2>&1 | tee philo_output.txt &
     philo_pid=$!
 
     # Wait for the specified time
