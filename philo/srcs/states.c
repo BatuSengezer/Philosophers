@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/25 05:34:03 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/25 14:06:43 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,12 +161,53 @@ void	*monitor_death(void *arg)
 					args->sim_params->philosophers[j].death_state = SOMEONE_DIED;
 				//can do death_check everyone is alive
 				pthread_mutex_unlock(&args->sim_params->death_mutex);
+				//test without usleep(70) to see if it increases efficiency;
+				usleep(70);
 				pthread_mutex_unlock(&args->philosopher->meal_mutex);
 				return (NULL);
 			}
 		// might need to add a mutex unlock here in if and after while loop
-			else if (!args->philosopher->meals_to_eat)
+		//     usleep(1000);
+			if (!args->philosopher->meals_to_eat)
 				return (pthread_mutex_unlock(&args->philosopher->meal_mutex), NULL);
 			pthread_mutex_unlock(&args->philosopher->meal_mutex);
 	}
 }
+
+
+// void *monitor_death(void *arg) {
+//   t_philosopher_args *args;
+//   long long i;
+//   long long j;
+//   args = (t_philosopher_args *)arg;
+//   while (1) {
+//     i = 0;
+//     while (i < args->sim_params->number_of_philosophers) {
+//       // maybe problem here mutex lock
+//       //  printf("last meal time stamp before lock %lld\n",
+//       //  args->sim_params->philosophers[i].last_meal_timestamp);
+//       pthread_mutex_lock(&args->sim_params->philosophers[i].meal_mutex);
+//       if (current_timestamp(args->sim_params->start_time) -
+//               args->sim_params->philosophers[i].last_meal_timestamp >=
+//           args->sim_params->time_to_die) {
+//         printf("last meal time stamp after lock %lld\n",
+//                args->sim_params->philosophers[i].last_meal_timestamp);
+//         args->philosopher->state = DIED;
+//         print_state(&args[i], DIED);
+//         pthread_mutex_lock(&args->sim_params->death_mutex);
+//         j = -1;
+//         while (++j < args->sim_params->number_of_philosophers)
+//           args->sim_params->philosophers[j].death_state = SOMEONE_DIED;
+//         // can do death_check everyone is alive
+//         pthread_mutex_unlock(&args->sim_params->death_mutex);
+//       }
+//       pthread_mutex_unlock(&args->sim_params->philosophers[i].meal_mutex);
+//       usleep(70);
+//       i++;
+//     }
+//     usleep(1000);
+//     // might need to add a mutex unlock here in if and after while loop
+//     if (args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
+//       break;
+//   }
+//   return (NULL);
