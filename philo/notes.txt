@@ -36,3 +36,13 @@ check visualizer with the output
 https://nafuka11.github.io/philosophers-visualizer/
 
 eating takes more then 200 ms
+
+
+
+New
+12)Make philos even and odd leave forks in order
+
+13)leave forks in case of death
+
+14) dies before
+ ./philo 5 800 200 200 3

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 21:55:24 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/22 21:55:26 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/25 00:55:58 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,11 @@ void	destroy_free(t_simulation_parameters *sim_params)
 		print_exit("Error: pthread_mutex_destroy failed\n ");
 	while (i < sim_params->number_of_philosophers)
 	{
-		if (pthread_mutex_destroy(&sim_params->forks[i].mutex_fork))
+		if (pthread_mutex_destroy(&sim_params->forks_mutexes[i]))
 			print_exit("Error: pthread_mutex_destroy failed\n ");
 		i++;
 	}
 	free(sim_params->philosophers);
-	free(sim_params->forks);
+	free(sim_params->forks_mutexes);
 	free(sim_params->args);
 }
