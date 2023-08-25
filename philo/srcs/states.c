@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/25 04:58:12 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/25 05:34:03 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,8 +75,10 @@ void	eat(t_philosopher_args	*args)
 			args->sim_params->start_time);
 	if (args->sim_params->hunger_check == ON)
 	{
+		//can replace all with meals to eat
 		args->philosopher->meals_eaten++;
 		args->sim_params->total_meals_eaten++;
+		args->philosopher->meals_to_eat--;
 		if (args->sim_params->total_meals_eaten >= args->sim_params
 			->total_meals_to_be_eaten)
 			args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
@@ -107,6 +109,7 @@ void	*eat_sleep_think(void *arg)
 		return (NULL);
 	}
 	pthread_mutex_lock(&args->sim_params->death_mutex);
+	//
 	while (args->philosopher->death_state == EVERYONE_ALIVE 
 		&& 	args->philosopher->meals_to_eat != 0)
 	{
@@ -147,8 +150,6 @@ void	*monitor_death(void *arg)
 				- args->philosopher->last_meal_timestamp
 				> args->sim_params->time_to_die))
 			{
-				if (args->philosopher->meals_to_eat > 0)
-					args->philosopher->meals_to_eat--;
 				// printf("total_meals_to_be_eaten: %d\n", args->sim_params->total_meals_to_be_eaten);
 				// printf("total_meals_eaten: %d\n", args->sim_params->total_meals_eaten);
 				// printf("philosoper meals to eat: %d\n",args->philosopher->meals_to_eat); 
