@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:48:05 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 23:00:55 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/25 03:44:13 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,11 +46,6 @@ typedef enum e_hunger_check
 	ON = 0,
 	OFF
 }							t_hunger_check;
-typedef struct s_fork
-{
-	int						id;
-	pthread_mutex_t			mutex_fork;
-}							t_fork;
 
 typedef struct s_philosopher
 {
@@ -59,10 +54,11 @@ typedef struct s_philosopher
 	pthread_t				monitor_thread;
 	pthread_mutex_t			meal_mutex;
 	t_philosopher_state		state;
-	t_fork					*fork_right;
-	t_fork					*fork_left;
+	pthread_mutex_t			*fork_right;
+	pthread_mutex_t			*fork_left;
 	long long				last_meal_timestamp;
 	int						meals_eaten;
+	int						meals_to_eat;
 	t_death_state			death_state;
 
 }							t_philosopher;
@@ -83,7 +79,7 @@ typedef struct s_simulation_parameters
 	t_hunger_check			hunger_check;
 	t_hunger_state			hunger_state;
 	t_philosopher			*philosophers;
-	t_fork					*forks;
+	pthread_mutex_t			*forks_mutexes;
 	pthread_mutex_t			print_mutex;
 	pthread_mutex_t			death_mutex;
 	t_philosopher_args		*args;
@@ -101,8 +97,7 @@ typedef struct s_philosopher_args
 void		allocate(t_simulation_parameters *sim_params);
 void		init_sim_param(t_simulation_parameters *sim_params,
 				int argc, char **argv);
-void		init_philosophers_and_forks(t_simulation_parameters *sim_params,
-				int i);
+void		init_philosophers_and_forks(t_simulation_parameters *sim_params);
 
 //simulation functions
 

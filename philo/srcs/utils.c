@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 21:55:11 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 23:59:55 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/25 02:05:42 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,40 +55,6 @@ void	handle_single_philosopher_case(t_philosopher_args *args)
 	usleep(args->sim_params->time_to_die * 1000);
 	printf("%lld %d died\n", current_timestamp(args->sim_params->start_time),
 		args->philosopher->id);
-}
-
-void	*monitor_death(void *arg)
-{
-	t_philosopher_args	*args;
-	long long			j;
-	args = (t_philosopher_args *)arg;
-	while (1)
-	{
-			pthread_mutex_lock(&args->philosopher->meal_mutex);
-			if (args->sim_params->hunger_state == PHILOSOPHERS_NOT_FULL_YET
-				&& (current_timestamp(args->sim_params->start_time)
-				- args->philosopher->last_meal_timestamp
-				>= args->sim_params->time_to_die))
-			{
-				// printf("last meal time stamp after lock %lld\n", args->philosopher->last_meal_timestamp);
-				// args->philosopher->state = DIED;
-				print_state(args, DIED);
-				pthread_mutex_lock(&args->sim_params->death_mutex);
-				j = -1;
-				while (++j < args->sim_params->number_of_philosophers)
-					args->sim_params->philosophers[j].death_state = SOMEONE_DIED;
-				//can do death_check everyone is alive
-				pthread_mutex_unlock(&args->sim_params->death_mutex);
-				pthread_mutex_unlock(&args->philosopher->meal_mutex);
-				return (NULL);
-			}
-		// might need to add a mutex unlock here in if and after while loop
-			if (args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
-				return (pthread_mutex_unlock(&args->philosopher->meal_mutex), NULL);
-			pthread_mutex_unlock(&args->philosopher->meal_mutex);
-
-	}
-	return (NULL);
 }
 
 long long	ft_atoi(const char *nptr)

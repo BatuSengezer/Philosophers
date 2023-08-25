@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:47:42 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/24 23:37:18 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/25 04:45:54 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ void	allocate(t_simulation_parameters *sim_params)
 			* sim_params->number_of_philosophers);
 	if (!sim_params->philosophers)
 		print_exit("Error: malloc philosophers failed\n");
-	sim_params->forks = (t_fork *)malloc(sizeof(t_fork)
+	sim_params->forks_mutexes = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
 			* sim_params->number_of_philosophers);
-	if (!sim_params->forks)
+	if (!sim_params->forks_mutexes)
 		print_exit("Error: malloc forks failed\n");
 	sim_params->args = (t_philosopher_args *)malloc(sizeof(t_philosopher_args)
 			* sim_params->number_of_philosophers);
@@ -36,7 +36,7 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 	{
 		sim_params->hunger_check = OFF;
 		sim_params->hunger_state = PHILOSOPHERS_NOT_FULL_YET;
-		sim_params->number_of_times_each_philo_must_eat = 0;
+		sim_params->number_of_times_each_philo_must_eat = -1;
 	}
 	if (argc == 6)
 	{
@@ -59,53 +59,60 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 		print_exit("Error: pthread_mutex_init failed\n");
 }
 
-void	init_philosophers_and_forks(t_simulation_parameters *sim_params, int i)
+void	init_philosophers_and_forks(t_simulation_parameters *sim_params)
 {
-	if (pthread_mutex_init(&sim_params->philosophers[i].meal_mutex, NULL))
-		print_exit("Error: pthread_mutex_init failed\n");
-	sim_params->philosophers[i].id = i + 1;
-	sim_params->philosophers[i].state = THINKING;
-	sim_params->philosophers[i].death_state = EVERYONE_ALIVE;
-	if (i == 0)
+	int i;
+
+	i = -1;
+	while(++i < sim_params->number_of_philosophers)
+		pthread_mutex_init(&sim_params->forks_mutexes[i], NULL);
+	i = -1;
+	while(++i < sim_params->number_of_philosophers)
 	{
-		sim_params->philosophers[i].fork_left = &sim_params->forks[i];
-		sim_params->philosophers[i].fork_right = &sim_params->forks[
+		pthread_mutex_init(&sim_params->philosophers[i].meal_mutex, NULL);
+		if(sim_params->number_of_times_each_philo_must_eat == -1)
+			sim_params->philosophers[i].meals_to_eat = -1;
+		else
+			sim_params->philosophers[i].meals_to_eat = sim_params->number_of_times_each_philo_must_eat;	
+		sim_params->philosophers[i].id = i + 1;
+		sim_params->philosophers[i].state = THINKING;
+		sim_params->philosophers[i].death_state = EVERYONE_ALIVE;
+		if (i == 0)
+		{
+			sim_params->philosophers[i].fork_left = &sim_params->forks_mutexes[i];
+			sim_params->philosophers[i].fork_right = &sim_params->forks_mutexes[
 			sim_params->number_of_philosophers - 1];
-	}
-	else
-	{
-		sim_params->philosophers[i].fork_left = &sim_params->forks[i];
-		sim_params->philosophers[i].fork_right = &sim_params->forks[i - 1];
-	}
-	sim_params->philosophers[i].last_meal_timestamp
+		}
+		else
+		{
+			sim_params->philosophers[i].fork_left = &sim_params->forks_mutexes[i];
+			sim_params->philosophers[i].fork_right = &sim_params->forks_mutexes[i - 1];
+		}
+		sim_params->philosophers[i].last_meal_timestamp
 		= current_timestamp(sim_params->start_time);
-	sim_params->philosophers[i].meals_eaten = 0;
-	sim_params->forks[i].id = i + 1;
-	if (pthread_mutex_init(&sim_params->forks[i].mutex_fork, NULL))
-		print_exit("Error: pthread_mutex_init failed\n");
+		sim_params->philosophers[i].meals_eaten = 0;
+		sim_params->args[i].philosopher = &sim_params->philosophers[i];
+		sim_params->args[i].sim_params = sim_params;
+		sim_params->args[i].print_mutex = &sim_params->print_mutex;
+	}
 }
 
 void	simulation(t_simulation_parameters *sim_params)
 {
 	long long	i;
 
+	init_philosophers_and_forks(sim_params);
 	i = -1;
 	while (++i < sim_params->number_of_philosophers)
 	{
-		init_philosophers_and_forks(sim_params, i);
-		sim_params->args[i].philosopher = &sim_params->philosophers[i];
-		sim_params->args[i].sim_params = sim_params;
-		sim_params->args[i].print_mutex = &sim_params->print_mutex;
-		if (pthread_create(&sim_params->philosophers[i].p_thread, NULL,
-				eat_sleep_think, &sim_params->args[i]))
-			print_exit("Error: pthread_create failed\n");
+		pthread_create(&sim_params->philosophers[i].p_thread, NULL,
+				eat_sleep_think, &sim_params->args[i]);
 	}
 	i = -1;
 	while (++i < sim_params->number_of_philosophers)
 	{
-		if (pthread_create(&sim_params->philosophers[i].monitor_thread, NULL,
-				monitor_death, &sim_params->args[i]))
-			print_exit("Error: pthread_create failed\n");
+		pthread_create(&sim_params->philosophers[i].monitor_thread, NULL,
+				monitor_death, &sim_params->args[i]);
 	}
 	i = -1;
 	while (++i < sim_params->number_of_philosophers)
