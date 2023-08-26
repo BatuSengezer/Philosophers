@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/26 13:59:11 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/26 14:21:22 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@ void	print_state(t_philosopher_args *args, t_philosopher_state state)
 {
 	pthread_mutex_lock(&args->sim_params->death_mutex);
 	pthread_mutex_lock(args->print_mutex);
-	printf("%lld %d ", current_timestamp(args->sim_params->start_time),
+	if (args->philosopher->death_state == EVERYONE_ALIVE)
+		printf("%lld %d ", current_timestamp(args->sim_params->start_time),
 		args->philosopher->id);
 	if (state == EATING && args->philosopher->death_state == EVERYONE_ALIVE)
 		printf("is eating\n");
@@ -27,7 +28,7 @@ void	print_state(t_philosopher_args *args, t_philosopher_state state)
 	else if (state == DIED && args->philosopher->death_state == EVERYONE_ALIVE)
 	{
 		printf("died\n");
-		exit(1);
+		// exit(1);
 	}
 	else if (state == HAS_FORK && args->philosopher->death_state == EVERYONE_ALIVE)
 		printf("has taken a fork\n");

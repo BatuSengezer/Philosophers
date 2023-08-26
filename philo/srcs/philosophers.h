@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:48:05 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/25 03:44:13 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/26 14:17:24 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ void		*eat_sleep_think(void *arg);
 void		input_check(int argc, char **argv);
 long long	current_timestamp(struct timeval start_time);
 void		handle_single_philosopher_case(t_philosopher_args *args);
-int			check_death(t_philosopher_args *args);
+// int			check_death(t_philosopher_args *args);
 long long	ft_atoi(const char *nptr);
 void		print_exit(char *str);
 void		destroy_free(t_simulation_parameters *sim_params);
