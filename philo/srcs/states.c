@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/25 14:35:47 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/26 13:59:11 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,14 +42,17 @@ int	pick_up_forks(t_philosopher_args *args)
 	//this if solves fork problem
 	// prevent philosophers from immediately trying 
 	// to eat or pick up forks too frequently
+	// can add && args->sim_params->number_of_philosophers %2 == 1 to if cond
+	// it increased survivability for even num of philos
 	if (current_timestamp(args->sim_params->start_time) 
 		- args->philosopher->last_meal_timestamp 
-		< args->sim_params->time_to_eat + args->sim_params->time_to_sleep + 10)
+		< args->sim_params->time_to_eat + args->sim_params->time_to_sleep + 10
+		&& args->sim_params->number_of_philosophers %2 == 1)
 		usleep(500);
 	if (args->philosopher->id % 2 == 0)
 	{
 		pthread_mutex_lock(args->philosopher->fork_right);
-		args->philosopher->state = HAS_FORK;
+		args->philosopher->state = HAS_FORK; // no need for these
 		print_state(args, HAS_FORK);
 		pthread_mutex_lock(args->philosopher->fork_left);
 		args->philosopher->state = HAS_FORKS;
