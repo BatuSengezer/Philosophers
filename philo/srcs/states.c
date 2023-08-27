@@ -151,5 +151,6 @@ void	*monitor_death(void *arg)
 		if (!args->philo->meals_to_eat)
 			return (pthread_mutex_unlock(&args->philo->meal_mutex), NULL);
 		pthread_mutex_unlock(&args->philo->meal_mutex);
+		usleep(500);
 	}
 }
