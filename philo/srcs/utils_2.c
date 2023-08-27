@@ -25,13 +25,13 @@ void	destroy_free(t_simulation_parameters *sim_params)
 	i = 0;
 	if (pthread_mutex_destroy(&sim_params->print_mutex))
 		print_exit("Error: pthread_mutex_destroy failed\n ");
-	while (i < sim_params->number_of_philosophers)
+	while (i < sim_params->number_of_philos)
 	{
-		if (pthread_mutex_destroy(&sim_params->forks_mutexes[i]))
+		if (pthread_mutex_destroy(&sim_params->forks[i]))
 			print_exit("Error: pthread_mutex_destroy failed\n ");
 		i++;
 	}
-	free(sim_params->philosophers);
-	free(sim_params->forks_mutexes);
+	free(sim_params->philos);
+	free(sim_params->forks);
 	free(sim_params->args);
 }

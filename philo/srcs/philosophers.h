@@ -68,7 +68,7 @@ typedef struct s_philosopher_args	t_philosopher_args;
 
 typedef struct s_simulation_parameters
 {
-	int						number_of_philosophers;
+	int						number_of_philos;
 	int						time_to_die;
 	int						time_to_eat;
 	int						time_to_sleep;
@@ -78,8 +78,8 @@ typedef struct s_simulation_parameters
 	int						total_meals_eaten;
 	t_hunger_check			hunger_check;
 	t_hunger_state			hunger_state;
-	t_philosopher			*philosophers;
-	pthread_mutex_t			*forks_mutexes;
+	t_philosopher			*philos;
+	pthread_mutex_t			*forks;
 	pthread_mutex_t			print_mutex;
 	pthread_mutex_t			death_mutex;
 	t_philosopher_args		*args;
@@ -87,7 +87,7 @@ typedef struct s_simulation_parameters
 
 typedef struct s_philosopher_args
 {
-	t_philosopher			*philosopher;
+	t_philosopher			*philo;
 	t_simulation_parameters	*sim_params;
 	pthread_mutex_t			*print_mutex;
 }							t_philosopher_args;
@@ -113,7 +113,6 @@ void		*eat_sleep_think(void *arg);
 void		input_check(int argc, char **argv);
 long long	current_timestamp(struct timeval start_time);
 void		handle_single_philosopher_case(t_philosopher_args *args);
-// int			check_death(t_philosopher_args *args);
 long long	ft_atoi(const char *nptr);
 void		print_exit(char *str);
 void		destroy_free(t_simulation_parameters *sim_params);

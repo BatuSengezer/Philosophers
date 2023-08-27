@@ -51,10 +51,10 @@ long long	current_timestamp(struct timeval start_time)
 void	handle_single_philosopher_case(t_philosopher_args *args)
 {
 	printf("%lld %d has taken a fork\n",
-		current_timestamp(args->sim_params->start_time), args->philosopher->id);
+		current_timestamp(args->sim_params->start_time), args->philo->id);
 	usleep(args->sim_params->time_to_die * 1000);
 	printf("%lld %d died\n", current_timestamp(args->sim_params->start_time),
-		args->philosopher->id);
+		args->philo->id);
 }
 
 long long	ft_atoi(const char *nptr)
