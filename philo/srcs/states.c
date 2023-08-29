@@ -82,9 +82,9 @@ void	eat(t_philosopher_args	*args)
 			->total_meals_to_be_eaten)
 			args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
 	}
+	pthread_mutex_unlock(&args->philo->meal_mutex);
 	print_state(args, EATING);
 	usleep(args->sim_params->time_to_eat * 1000);
-	pthread_mutex_unlock(&args->philo->meal_mutex);
 	if (args->philo->id % 2 == 1)
 		if (pthread_mutex_unlock(args->philo->fork_right) 
 			|| pthread_mutex_unlock(args->philo->fork_left))
