@@ -115,6 +115,8 @@ void	*eat_sleep_think(void *arg)
 		eat(args);
 		print_state(args, SLEEPING);
 		usleep(args->sim_params->time_to_sleep * 1000);
+		if (args->philo->meals_to_eat == 0)
+			print_state(args, THINKING);
 		// args->philo->state = THINKING;
 		// print_state(args, THINKING);
 		pthread_mutex_lock(&args->sim_params->death_mutex);
