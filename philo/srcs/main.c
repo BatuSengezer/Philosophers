@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:47:42 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/25 04:45:54 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/31 11:10:00 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,13 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 	if (argc == 5)
 	{
 		sim_params->hunger_check = OFF;
-		sim_params->hunger_state = PHILOSOPHERS_NOT_FULL_YET;
+		// sim_params->hunger_state = PHILOSOPHERS_NOT_FULL_YET;
 		sim_params->number_of_times_each_philo_must_eat = 0;
 	}
 	if (argc == 6)
 	{
 		sim_params->hunger_check = ON;
-		sim_params->hunger_state = PHILOSOPHERS_NOT_FULL_YET;
+		// sim_params->hunger_state = PHILOSOPHERS_NOT_FULL_YET;
 		sim_params->number_of_times_each_philo_must_eat = ft_atoi(argv[5]);
 	}
 	sim_params->number_of_philos = ft_atoi(argv[1]);
@@ -89,6 +89,7 @@ void	init_philos_and_forks(t_simulation_parameters *sim_params)
 			sim_params->philos[i].fork_left = &sim_params->forks[i];
 			sim_params->philos[i].fork_right = &sim_params->forks[i - 1];
 		}
+		sim_params->philos[i].finished = 0;
 		sim_params->philos[i].last_meal_timestamp
 			= current_timestamp(sim_params->start_time);
 		sim_params->philos[i].meals_eaten = 0;
@@ -113,7 +114,7 @@ void	simulation(t_simulation_parameters *sim_params)
 	while (++i < sim_params->number_of_philos)
 	{
 		pthread_create(&sim_params->philos[i].monitor_thread, NULL,
-			monitor_death, &sim_params->args[i]);
+			monitor_death_and_finished, &sim_params->args[i]);
 	}
 	i = -1;
 	while (++i < sim_params->number_of_philos)
@@ -137,8 +138,8 @@ int	main(int argc, char **argv)
 	init_sim_param(&sim_params, argc, argv);
 	simulation(&sim_params);
 	destroy_free(&sim_params);
-	// if (sim_params.hunger_check == ON
-	// 	&& sim_params.hunger_state == PHILOSOPHERS_ARE_FULL)
-	// 	printf("Everyone ate enough\n");
+	if (sim_params.hunger_check == ON
+		&& sim_params.total_meals_eaten >= sim_params.total_meals_to_be_eaten)
+		printf("Everyone ate enough\n");
 	return (0);
 }

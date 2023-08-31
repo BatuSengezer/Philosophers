@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/26 14:21:22 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/31 11:09:34 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,9 +78,9 @@ void	eat(t_philosopher_args	*args)
 		args->philo->meals_eaten++;
 		args->sim_params->total_meals_eaten++;
 		args->philo->meals_to_eat--;
-		if (args->sim_params->total_meals_eaten >= args->sim_params
-			->total_meals_to_be_eaten)
-			args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
+		// if (args->sim_params->total_meals_eaten >= args->sim_params
+		// 	->total_meals_to_be_eaten)
+		// 	args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
 	}
 	pthread_mutex_unlock(&args->philo->meal_mutex);
 	print_state(args, EATING);
@@ -113,6 +113,16 @@ void	*eat_sleep_think(void *arg)
 		pthread_mutex_unlock(&args->sim_params->death_mutex);
 		print_state(args, THINKING); // can add state instead of thinking
 		eat(args);
+
+		// this might work
+		pthread_mutex_lock(&args->philo->meal_mutex);
+		if (args->philo->finished)
+		{
+			pthread_mutex_unlock(&args->philo->meal_mutex);
+			return (NULL);
+		}
+		pthread_mutex_unlock(&args->philo->meal_mutex);
+		
 		print_state(args, SLEEPING);
 		usleep(args->sim_params->time_to_sleep * 1000);
 		if (args->philo->meals_to_eat == 0)
@@ -125,7 +135,7 @@ void	*eat_sleep_think(void *arg)
 	return (NULL);
 }
 
-void	*monitor_death(void *arg)
+void	*monitor_death_and_finished(void *arg)
 {
 	t_philosopher_args	*args;
 	long long			j;
@@ -134,6 +144,13 @@ void	*monitor_death(void *arg)
 	while (1)
 	{
 		pthread_mutex_lock(&args->philo->meal_mutex);
+		if (args->sim_params->total_meals_eaten >= args->sim_params
+			->total_meals_to_be_eaten)
+		{
+			j = -1;
+			while (++j < args->sim_params->number_of_philos)
+				args->sim_params->philos[j].finished = 1;
+		}
 		if (args->philo->meals_to_eat 
 			&& (current_timestamp(args->sim_params->start_time)
 				- args->philo->last_meal_timestamp
