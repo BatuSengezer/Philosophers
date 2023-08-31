@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/31 11:09:34 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/08/31 11:19:51 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ void	*monitor_death_and_finished(void *arg)
 	while (1)
 	{
 		pthread_mutex_lock(&args->philo->meal_mutex);
-		if (args->sim_params->total_meals_eaten >= args->sim_params
+		if (args->sim_params->hunger_check == ON && args->sim_params->total_meals_eaten >= args->sim_params
 			->total_meals_to_be_eaten)
 		{
 			j = -1;
