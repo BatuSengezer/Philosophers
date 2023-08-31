@@ -1,7 +1,7 @@
 NAME = philo
 CC = cc
 RM = rm -rf
-FLAGS = -Wall -Wextra -Werror -g
+FLAGS = -Wall -Wextra -Werror -g 
 OBJ_DIR = objs/
 SRC_DIR = srcs/
 
@@ -21,7 +21,9 @@ $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
 
 $(NAME): $(OBJS)
-		$(CC) $(FLAGS) $(OBJS) -o $(NAME) 
+		$(CC) $(FLAGS) $(OBJS) -o $(NAME)
+#		$(CC) $(FLAGS) -fsanitize=thread -lpthread $(OBJS) -o $(NAME) 
+
 
 clean:
 		$(RM) $(OBJ_DIR)

@@ -78,11 +78,16 @@ void	eat(t_philosopher_args	*args)
 		args->philo->meals_eaten++;
 		args->sim_params->total_meals_eaten++;
 		args->philo->meals_to_eat--;
+		// pthread_mutex_unlock(&args->philo->meal_mutex);
+		pthread_mutex_lock(&args->sim_params->finished_mutex);
 		if (args->sim_params->total_meals_eaten >= args->sim_params
 			->total_meals_to_be_eaten)
 			args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
+		pthread_mutex_unlock(&args->sim_params->finished_mutex);
+		
+
 	}
-	pthread_mutex_unlock(&args->philo->meal_mutex);
+		pthread_mutex_unlock(&args->philo->meal_mutex);
 	print_state(args, EATING);
 	usleep(args->sim_params->time_to_eat * 1000);
 	if (args->philo->id % 2 == 1)
@@ -113,6 +118,24 @@ void	*eat_sleep_think(void *arg)
 		pthread_mutex_unlock(&args->sim_params->death_mutex);
 		print_state(args, THINKING); // can add state instead of thinking
 		eat(args);
+
+		if (args->philo->meals_to_eat == 0)
+		{
+		pthread_mutex_lock(&args->sim_params->finished_mutex);
+		if (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL)
+		{
+						print_state(args, SLEEPING);
+
+			pthread_mutex_unlock(&args->sim_params->finished_mutex);
+			return NULL;
+		}
+		if (args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
+		{
+			pthread_mutex_unlock(&args->sim_params->finished_mutex);
+			return NULL;
+		}
+		pthread_mutex_unlock(&args->sim_params->finished_mutex);
+		}
 		print_state(args, SLEEPING);
 		usleep(args->sim_params->time_to_sleep * 1000);
 		if (args->philo->meals_to_eat == 0)
@@ -132,7 +155,16 @@ void	*monitor_death(void *arg)
 
 	args = (t_philosopher_args *)arg;
 	while (1)
-	{
+	{			
+		// pthread_mutex_lock(&args->philo->meal_mutex);
+
+		// pthread_mutex_lock(&args->sim_params->finished_mutex);
+		// if (args->sim_params->total_meals_eaten >= args->sim_params
+		// 	->total_meals_to_be_eaten)
+		// 	args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
+		// pthread_mutex_unlock(&args->sim_params->finished_mutex);
+		// pthread_mutex_unlock(&args->philo->meal_mutex);
+
 		pthread_mutex_lock(&args->philo->meal_mutex);
 		if (args->philo->meals_to_eat 
 			&& (current_timestamp(args->sim_params->start_time)

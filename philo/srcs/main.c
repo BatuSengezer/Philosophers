@@ -57,6 +57,9 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 		print_exit("Error: pthread_mutex_init failed\n");
 	if (pthread_mutex_init(&sim_params->death_mutex, NULL))
 		print_exit("Error: pthread_mutex_init failed\n");
+	if (pthread_mutex_init(&sim_params->finished_mutex, NULL))
+		print_exit("Error: pthread_mutex_init failed\n");
+
 }
 
 void	init_philos_and_forks(t_simulation_parameters *sim_params)
