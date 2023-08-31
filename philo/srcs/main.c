@@ -140,8 +140,8 @@ int	main(int argc, char **argv)
 	init_sim_param(&sim_params, argc, argv);
 	simulation(&sim_params);
 	destroy_free(&sim_params);
-	// if (sim_params.hunger_check == ON
-	// 	&& sim_params.hunger_state == PHILOSOPHERS_ARE_FULL)
-	// 	printf("Everyone ate enough\n");
+	if (sim_params.hunger_check == ON
+		&& sim_params.hunger_state == PHILOSOPHERS_ARE_FULL)
+		printf("%lld Everyone ate enough\n",current_timestamp(sim_params.start_time));
 	return (0);
 }
