@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:47:42 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/25 04:45:54 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/09/01 03:27:40 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,8 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 		print_exit("Error: pthread_mutex_init failed\n");
 	if (pthread_mutex_init(&sim_params->death_mutex, NULL))
 		print_exit("Error: pthread_mutex_init failed\n");
-	if (pthread_mutex_init(&sim_params->finished_mutex, NULL))
-		print_exit("Error: pthread_mutex_init failed\n");
+	// if (pthread_mutex_init(&sim_params->finished_mutex, NULL))
+	// 	print_exit("Error: pthread_mutex_init failed\n");
 
 }
 

@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/26 14:21:22 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/09/01 03:19:06 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,38 +69,43 @@ int	pick_up_forks(t_philosopher_args *args)
 
 void	eat(t_philosopher_args	*args)
 {
-		pthread_mutex_lock(&args->sim_params->finished_mutex);
-		if (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL)
-		{
-			pthread_mutex_unlock(&args->sim_params->finished_mutex);
+		// pthread_mutex_lock(&args->sim_params->finished_mutex);
+		// if (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL)
+		// {
+		// 	pthread_mutex_unlock(&args->sim_params->finished_mutex);
 		pick_up_forks(args);
-		}
-		else
-			pthread_mutex_unlock(&args->sim_params->finished_mutex);
+		// }
+		// else
+		// 	pthread_mutex_unlock(&args->sim_params->finished_mutex);
 	// pick_up_forks(args);
 	pthread_mutex_lock(&args->philo->meal_mutex);
 	args->philo->last_meal_timestamp = current_timestamp(
 			args->sim_params->start_time);
 	if (args->sim_params->hunger_check == ON)
 	{
+		print_state(args, EATING);
+		usleep(args->sim_params->time_to_eat * 1000);
 		args->philo->meals_eaten++;
 		args->sim_params->total_meals_eaten++;
-		args->philo->meals_to_eat--;
-		// pthread_mutex_unlock(&args->philo->meal_mutex);
-		pthread_mutex_lock(&args->sim_params->finished_mutex);
-		if (args->sim_params->total_meals_eaten == args->sim_params
-			->total_meals_to_be_eaten)
-		{
-			args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
-		}
-		pthread_mutex_unlock(&args->sim_params->finished_mutex);
-		
-
+		args->philo->meals_to_eat--;	
+		pthread_mutex_unlock(&args->philo->meal_mutex);
+		// pthread_mutex_lock(&args->philo->meal_mutex);
+		// if (args->sim_params->total_meals_eaten == args->sim_params
+		// 	->total_meals_to_be_eaten)
+		// {
+		// 	pthread_mutex_unlock(&args->philo->meal_mutex);
+		// 	args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
+		// }
+		// else
+		// 	pthread_mutex_unlock(&args->philo->meal_mutex);
 	}
-	pthread_mutex_unlock(&args->philo->meal_mutex);
-	print_state(args, EATING);
-	usleep(args->sim_params->time_to_eat * 1000);
-
+	else
+	{
+		print_state(args, EATING);
+		usleep(args->sim_params->time_to_eat * 1000);
+		pthread_mutex_unlock(&args->philo->meal_mutex);
+	}
+	
 	if (args->philo->id % 2 == 1)
 		if (pthread_mutex_unlock(args->philo->fork_right) 
 			|| pthread_mutex_unlock(args->philo->fork_left))
@@ -123,31 +128,32 @@ void	*eat_sleep_think(void *arg)
 	}
 	pthread_mutex_lock(&args->sim_params->death_mutex);
 	//
-	while (args->philo->death_state == EVERYONE_ALIVE 
-		&& args->philo->meals_to_eat)
+	while (args->philo->death_state == EVERYONE_ALIVE )
 	{
 		pthread_mutex_unlock(&args->sim_params->death_mutex);
 		print_state(args, THINKING); // can add state instead of thinking
-		pthread_mutex_lock(&args->sim_params->finished_mutex);
-		if (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL)
+		pthread_mutex_lock(&args->sim_params->death_mutex);
+		if (args->philo->death_state == EVERYONE_ALIVE && args->philo->meals_to_eat)
 		{
-		pthread_mutex_unlock(&args->sim_params->finished_mutex);
-
-		eat(args);
+			pthread_mutex_unlock(&args->sim_params->death_mutex);
+			eat(args);
 		}
 		else
-			pthread_mutex_unlock(&args->sim_params->finished_mutex);
+			pthread_mutex_unlock(&args->sim_params->death_mutex);
 
-
-		pthread_mutex_lock(&args->sim_params->finished_mutex);
-		if (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL)
-		{
-			pthread_mutex_unlock(&args->sim_params->finished_mutex);
+	
+		pthread_mutex_lock(&args->sim_params->death_mutex);
+		if (args->philo->death_state == EVERYONE_ALIVE)	
+		{	
+			pthread_mutex_unlock(&args->sim_params->death_mutex);
 			print_state(args, SLEEPING);
 			usleep(args->sim_params->time_to_sleep * 1000);
 		}
 		else
-			pthread_mutex_unlock(&args->sim_params->finished_mutex);
+			pthread_mutex_unlock(&args->sim_params->death_mutex);
+		// }
+		// else
+		// 	pthread_mutex_unlock(&args->sim_params->finished_mutex);
 		pthread_mutex_lock(&args->sim_params->death_mutex);
 
 	}
@@ -163,22 +169,13 @@ void	*monitor_death(void *arg)
 	args = (t_philosopher_args *)arg;
 	while (1)
 	{			
-		// pthread_mutex_lock(&args->philo->meal_mutex);
-
-		// pthread_mutex_lock(&args->sim_params->finished_mutex);
-		// if (args->sim_params->total_meals_eaten >= args->sim_params
-		// 	->total_meals_to_be_eaten)
-		// 	args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
-		// pthread_mutex_unlock(&args->sim_params->finished_mutex);
-		// pthread_mutex_unlock(&args->philo->meal_mutex);
-
 		pthread_mutex_lock(&args->philo->meal_mutex);
-		if (args->philo->meals_to_eat 
-			&& (current_timestamp(args->sim_params->start_time)
+		if ((current_timestamp(args->sim_params->start_time)
 				- args->philo->last_meal_timestamp
-				> args->sim_params->time_to_die))
+				> args->sim_params->time_to_die) || args->sim_params->total_meals_eaten == args->sim_params->total_meals_to_be_eaten)
 		{
-			print_state(args, DIED);
+			if (args->sim_params->total_meals_eaten != args->sim_params->total_meals_to_be_eaten)
+					print_state(args, DIED);
 			pthread_mutex_lock(&args->sim_params->death_mutex);
 			j = -1;
 			while (++j < args->sim_params->number_of_philos)
