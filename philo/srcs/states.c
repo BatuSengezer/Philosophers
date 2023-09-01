@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/09/01 12:12:38 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/09/01 12:29:39 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,11 +128,11 @@ void	*eat_sleep_think(void *arg)
 	}
 	pthread_mutex_lock(&args->sim_params->death_mutex);
 	//
-	while (args->philo->death_state == EVERYONE_ALIVE && args->philo->meals_to_eat)
+	while (args->philo->death_state == EVERYONE_ALIVE && args->philo->meals_to_eat != 0)
 	{
-		pthread_mutex_unlock(&args->sim_params->death_mutex);
+		// pthread_mutex_unlock(&args->sim_params->death_mutex);
 
-
+		// can add lock unlock here
 		if (args->philo->death_state == EVERYONE_ALIVE)	
 		{	
 			pthread_mutex_unlock(&args->sim_params->death_mutex);
@@ -181,7 +181,7 @@ void	*monitor_death(void *arg)
 		pthread_mutex_lock(&args->philo->meal_mutex);
 		if ((current_timestamp(args->sim_params->start_time)
 				- args->philo->last_meal_timestamp
-				> args->sim_params->time_to_die) || args->sim_params->total_meals_eaten == args->sim_params->total_meals_to_be_eaten)
+				> args->sim_params->time_to_die) || (args->sim_params->total_meals_eaten == args->sim_params->total_meals_to_be_eaten && args->sim_params->hunger_check == ON))
 		{
 			if (args->sim_params->total_meals_eaten != args->sim_params->total_meals_to_be_eaten)
 					print_state(args, DIED);
