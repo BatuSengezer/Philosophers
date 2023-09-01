@@ -60,6 +60,8 @@ typedef struct s_philosopher
 	int						meals_eaten;
 	int						meals_to_eat;
 	t_death_state			death_state;
+	int						total_meals_to_be_eaten;
+	int						total_meals_eaten;
 
 }							t_philosopher;
 
@@ -74,8 +76,8 @@ typedef struct s_simulation_parameters
 	int						time_to_sleep;
 	struct timeval			start_time;
 	int						number_of_times_each_philo_must_eat;
-	int						total_meals_to_be_eaten;
-	int						total_meals_eaten;
+	// int						total_meals_to_be_eaten;
+	// int						total_meals_eaten;
 	t_hunger_check			hunger_check;
 	t_hunger_state			hunger_state;
 	t_philosopher			*philos;

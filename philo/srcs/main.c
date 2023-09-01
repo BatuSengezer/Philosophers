@@ -48,8 +48,8 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 	sim_params->time_to_die = ft_atoi(argv[2]);
 	sim_params->time_to_eat = ft_atoi(argv[3]);
 	sim_params->time_to_sleep = ft_atoi(argv[4]);
-	sim_params->total_meals_to_be_eaten = sim_params->number_of_philos
-		* sim_params->number_of_times_each_philo_must_eat;
+	// sim_params->total_meals_to_be_eaten = sim_params->number_of_philos
+	// 	* sim_params->number_of_times_each_philo_must_eat;
 	if (gettimeofday(&sim_params->start_time, NULL) == -1)
 		print_exit("Error: gettimeofday failed\n");
 	allocate(sim_params);
@@ -92,6 +92,11 @@ void	init_philos_and_forks(t_simulation_parameters *sim_params)
 			sim_params->philos[i].fork_left = &sim_params->forks[i];
 			sim_params->philos[i].fork_right = &sim_params->forks[i - 1];
 		}
+
+		sim_params->philos[i].total_meals_to_be_eaten = sim_params->number_of_philos
+		* sim_params->number_of_times_each_philo_must_eat;
+		sim_params->philos[i].total_meals_eaten = 0;
+
 		sim_params->philos[i].last_meal_timestamp
 			= current_timestamp(sim_params->start_time);
 		sim_params->philos[i].meals_eaten = 0;
@@ -140,8 +145,8 @@ int	main(int argc, char **argv)
 	init_sim_param(&sim_params, argc, argv);
 	simulation(&sim_params);
 	destroy_free(&sim_params);
-	if (sim_params.hunger_check == ON
-		&& sim_params.hunger_state == PHILOSOPHERS_ARE_FULL)
-		printf("%lld Everyone ate enough\n",current_timestamp(sim_params.start_time));
+	// if (sim_params.hunger_check == ON
+	// 	&& sim_params.hunger_state == PHILOSOPHERS_ARE_FULL)
+	// 	printf("%lld Everyone ate enough\n",current_timestamp(sim_params.start_time));
 	return (0);
 }
