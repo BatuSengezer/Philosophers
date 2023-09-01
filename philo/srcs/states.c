@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/09/01 03:19:06 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/09/01 12:12:38 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,10 +128,19 @@ void	*eat_sleep_think(void *arg)
 	}
 	pthread_mutex_lock(&args->sim_params->death_mutex);
 	//
-	while (args->philo->death_state == EVERYONE_ALIVE )
+	while (args->philo->death_state == EVERYONE_ALIVE && args->philo->meals_to_eat)
 	{
 		pthread_mutex_unlock(&args->sim_params->death_mutex);
-		print_state(args, THINKING); // can add state instead of thinking
+
+
+		if (args->philo->death_state == EVERYONE_ALIVE)	
+		{	
+			pthread_mutex_unlock(&args->sim_params->death_mutex);
+			print_state(args, THINKING); // can add state instead of thinking
+		}
+		else
+			pthread_mutex_unlock(&args->sim_params->death_mutex);
+
 		pthread_mutex_lock(&args->sim_params->death_mutex);
 		if (args->philo->death_state == EVERYONE_ALIVE && args->philo->meals_to_eat)
 		{
@@ -151,11 +160,11 @@ void	*eat_sleep_think(void *arg)
 		}
 		else
 			pthread_mutex_unlock(&args->sim_params->death_mutex);
-		// }
-		// else
-		// 	pthread_mutex_unlock(&args->sim_params->finished_mutex);
+		
+		if (args->philo->meals_to_eat == 0)
+			print_state(args, THINKING);
+		
 		pthread_mutex_lock(&args->sim_params->death_mutex);
-
 	}
 	pthread_mutex_unlock(&args->sim_params->death_mutex);
 	return (NULL);
