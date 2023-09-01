@@ -50,6 +50,7 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 	sim_params->time_to_sleep = ft_atoi(argv[4]);
 	sim_params->total_meals_to_be_eaten = sim_params->number_of_philos
 		* sim_params->number_of_times_each_philo_must_eat;
+	sim_params->total_meals_eaten = 0;
 	if (gettimeofday(&sim_params->start_time, NULL) == -1)
 		print_exit("Error: gettimeofday failed\n");
 	allocate(sim_params);
@@ -57,8 +58,8 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 		print_exit("Error: pthread_mutex_init failed\n");
 	if (pthread_mutex_init(&sim_params->death_mutex, NULL))
 		print_exit("Error: pthread_mutex_init failed\n");
-	// if (pthread_mutex_init(&sim_params->finished_mutex, NULL))
-	// 	print_exit("Error: pthread_mutex_init failed\n");
+	if (pthread_mutex_init(&sim_params->finished_mutex, NULL))
+		print_exit("Error: pthread_mutex_init failed\n");
 
 }
 
