@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/09/02 18:02:08 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/09/02 18:18:33 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,25 +75,20 @@ void	eat(t_philosopher_args	*args)
 			args->sim_params->start_time);
 	if (args->sim_params->hunger_check == ON)
 	{
-		print_state(args, EATING);
-		usleep(args->sim_params->time_to_eat * 1000);
 		args->philo->meals_eaten++;
 		args->sim_params->total_meals_eaten++;
 		args->philo->meals_to_eat--;
-		// pthread_mutex_unlock(&args->philo->meal_mutex);	
+		// pthread_mutex_unlock(&args->philo->meal_mutex);
 		pthread_mutex_lock(&args->sim_params->finished_mutex);
 		if (args->sim_params->total_meals_eaten >= args->sim_params
 			->total_meals_to_be_eaten)
 			args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
 		pthread_mutex_unlock(&args->sim_params->finished_mutex);
-		pthread_mutex_unlock(&args->philo->meal_mutex);
+		
 	}
-	else
-	{
 		pthread_mutex_unlock(&args->philo->meal_mutex);
-		print_state(args, EATING);
-		usleep(args->sim_params->time_to_eat * 1000);
-	}
+	print_state(args, EATING);
+	usleep(args->sim_params->time_to_eat * 1000);
 	if (args->philo->id % 2 == 1)
 		if (pthread_mutex_unlock(args->philo->fork_right) 
 			|| pthread_mutex_unlock(args->philo->fork_left))
@@ -133,6 +128,15 @@ void	*eat_sleep_think(void *arg)
 		{
 			pthread_mutex_unlock(&args->sim_params->finished_mutex);
 			eat(args);
+			pthread_mutex_lock(&args->sim_params->finished_mutex);
+			if (args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
+			{
+				pthread_mutex_unlock(&args->sim_params->finished_mutex);
+				print_state(args, SLEEPING);
+				return (NULL);
+			}
+			pthread_mutex_unlock(&args->sim_params->finished_mutex);
+
 		}
 		else
 			pthread_mutex_unlock(&args->sim_params->finished_mutex);
