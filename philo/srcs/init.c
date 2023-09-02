@@ -1,33 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: bsengeze <bsengeze@student.42berlin.d      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/22 20:47:42 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/08/25 04:45:54 by bsengeze         ###   ########.fr       */
+/*   Created: 2023/09/02 23:12:52 by bsengeze          #+#    #+#             */
+/*   Updated: 2023/09/02 23:12:55 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-//allocate memory for philos, forks, and args
-void	allocate(t_simulation_parameters *sim_params)
-{
-	sim_params->philos = (t_philosopher *)malloc(sizeof(t_philosopher)
-			* sim_params->number_of_philos);
-	if (!sim_params->philos)
-		print_exit("Error: malloc philos failed\n");
-	sim_params->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
-			* sim_params->number_of_philos);
-	if (!sim_params->forks)
-		print_exit("Error: malloc forks failed\n");
-	sim_params->args = (t_philosopher_args *)malloc(sizeof(t_philosopher_args)
-			* sim_params->number_of_philos);
-	if (!sim_params->args)
-		print_exit("Error: malloc args failed\n");
-}
 
 void	init_sim_param(t_simulation_parameters *sim_params,
 		int argc, char **argv)
@@ -51,6 +34,22 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 	sim_params->total_meals_to_be_eaten = sim_params->number_of_philos
 		* sim_params->meals_to_eat_each;
 	gettimeofday(&sim_params->start_time, NULL);
+}
+
+void	allocate(t_simulation_parameters *sim_params)
+{
+	sim_params->philos = (t_philosopher *)malloc(sizeof(t_philosopher)
+			* sim_params->number_of_philos);
+	if (!sim_params->philos)
+		print_exit("Error: malloc philos failed\n");
+	sim_params->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
+			* sim_params->number_of_philos);
+	if (!sim_params->forks)
+		print_exit("Error: malloc forks failed\n");
+	sim_params->args = (t_philosopher_args *)malloc(sizeof(t_philosopher_args)
+			* sim_params->number_of_philos);
+	if (!sim_params->args)
+		print_exit("Error: malloc args failed\n");
 }
 
 void	init_mutexes(t_simulation_parameters *sim_params)
@@ -79,7 +78,6 @@ void	init_philos(t_simulation_parameters *sim_params)
 		if (sim_params->meals_to_eat_each == 0)
 			sim_params->philos[i].meals_to_eat = -1;
 		sim_params->philos[i].id = i + 1;
-		sim_params->philos[i].state = THINKING;
 		sim_params->philos[i].death_state = EVERYONE_ALIVE;
 		if (i == 0)
 		{
@@ -108,48 +106,4 @@ void	init_args(t_simulation_parameters *sim_params)
 		sim_params->args[i].sim_params = sim_params;
 		sim_params->args[i].print_mutex = &sim_params->print_mutex;
 	}
-}
-
-void	simulation(t_simulation_parameters *sim_params)
-{
-	long long	i;
-
-	i = -1;
-	while (++i < sim_params->number_of_philos)
-	{
-		pthread_create(&sim_params->philos[i].p_thread, NULL,
-			eat_sleep_think, &sim_params->args[i]);
-	}
-	i = -1;
-	while (++i < sim_params->number_of_philos)
-	{
-		pthread_create(&sim_params->philos[i].monitor_thread, NULL,
-			monitor_death, &sim_params->args[i]);
-	}
-	i = -1;
-	while (++i < sim_params->number_of_philos)
-		pthread_join(sim_params->philos[i].p_thread, NULL);
-	i = -1;
-	while (++i < sim_params->number_of_philos)
-	{
-		pthread_join(sim_params->philos[i].monitor_thread, NULL);
-	}
-}
-
-int	main(int argc, char **argv)
-{
-	t_simulation_parameters	sim_params;
-
-	input_check(argc, argv);
-	init_sim_param(&sim_params, argc, argv);
-	allocate(&sim_params);
-	init_mutexes(&sim_params);
-	init_philos(&sim_params);
-	init_args(&sim_params);
-	simulation(&sim_params);
-	destroy_free(&sim_params);
-	// if (sim_params.hunger_check == ON
-	// 	&& sim_params.hunger_state == PHILOSOPHERS_ARE_FULL)
-	// 	printf("%lld Everyone ate enough\n", current_timestamp(sim_params.start_time));
-	return (0);
 }

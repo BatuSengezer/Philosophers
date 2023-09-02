@@ -53,7 +53,6 @@ typedef struct s_philosopher
 	pthread_t				p_thread;
 	pthread_t				monitor_thread;
 	pthread_mutex_t			meal_mutex;
-	t_philosopher_state		state;
 	pthread_mutex_t			*fork_right;
 	pthread_mutex_t			*fork_left;
 	long long				last_meal_timestamp;
@@ -101,13 +100,13 @@ void		init_mutexes(t_simulation_parameters *sim_params);
 void		init_philos(t_simulation_parameters *sim_params);
 void		init_args(t_simulation_parameters *sim_params);
 
-
 //simulation functions
 
 void		*monitor_death(void *arg);
 void		simulation(t_simulation_parameters *sim_params);
 void		print_state(t_philosopher_args *args, t_philosopher_state state);
-int			pick_up_forks(t_philosopher_args *args);
+void		pick_up_forks(t_philosopher_args *args);
+void		drop_forks(t_philosopher_args *args);
 void		eat(t_philosopher_args	*args);
 void		*eat_sleep_think(void *arg);
 

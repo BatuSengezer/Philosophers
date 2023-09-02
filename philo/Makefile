@@ -5,7 +5,7 @@ FLAGS = -Wall -Wextra -Werror -g
 OBJ_DIR = objs/
 SRC_DIR = srcs/
 
-SRC 	= main.c states.c utils.c utils_2.c
+SRC 	= philosophers.c init.c states.c forks.c utils.c utils_2.c
 
 SRCS	= $(addprefix $(SRC_DIR), $(SRC))
 
@@ -23,7 +23,6 @@ $(OBJ_DIR):
 $(NAME): $(OBJS)
 		$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 #		$(CC) $(FLAGS) -fsanitize=thread -lpthread $(OBJS) -o $(NAME) 
-
 
 clean:
 		$(RM) $(OBJ_DIR)

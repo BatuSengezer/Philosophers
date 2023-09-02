@@ -37,26 +37,6 @@ void	input_check(int argc, char **argv)
 	}
 }
 
-long long	current_timestamp(struct timeval start_time)
-{
-	struct timeval	now;
-	long long		elapsed_time;
-
-	gettimeofday(&now, NULL);
-	elapsed_time = (now.tv_sec - start_time.tv_sec) * 1000;
-	elapsed_time += (now.tv_usec - start_time.tv_usec) / 1000;
-	return (elapsed_time);
-}
-
-void	handle_single_philosopher_case(t_philosopher_args *args)
-{
-	printf("%lld %d has taken a fork\n",
-		current_timestamp(args->sim_params->start_time), args->philo->id);
-	usleep(args->sim_params->time_to_die * 1000);
-	printf("%lld %d died\n", current_timestamp(args->sim_params->start_time),
-		args->philo->id);
-}
-
 long long	ft_atoi(const char *nptr)
 {
 	long long	result;
