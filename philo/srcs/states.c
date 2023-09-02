@@ -171,12 +171,11 @@ void	*eat_sleep_think(void *arg)
 	// 	else
 	// 		pthread_mutex_unlock(&args->sim_params->finished_mutex);
 		print_state(args, THINKING);
-		pthread_mutex_lock(&args->sim_params->finished_mutex);
 		pthread_mutex_lock(&args->sim_params->death_mutex);
-
+		pthread_mutex_lock(&args->sim_params->finished_mutex);
 	}
-	pthread_mutex_unlock(&args->sim_params->death_mutex);
 	pthread_mutex_unlock(&args->sim_params->finished_mutex);
+	pthread_mutex_unlock(&args->sim_params->death_mutex);
 	return (NULL);
 }
 
