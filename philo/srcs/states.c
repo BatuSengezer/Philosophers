@@ -83,7 +83,7 @@ void	eat(t_philosopher_args	*args)
 			args->sim_params->start_time);
 	if (args->sim_params->hunger_check == ON)
 	{
-		args->philo->meals_eaten++;
+		// args->philo->meals_eaten++;
 		args->sim_params->total_meals_eaten++;
 		args->philo->meals_to_eat--;
 		// pthread_mutex_unlock(&args->philo->meal_mutex);
@@ -187,15 +187,6 @@ void	*monitor_death(void *arg)
 	args = (t_philosopher_args *)arg;
 	while (1)
 	{			
-		// pthread_mutex_lock(&args->philo->meal_mutex);
-
-		// pthread_mutex_lock(&args->sim_params->finished_mutex);
-		// if (args->sim_params->total_meals_eaten >= args->sim_params
-		// 	->total_meals_to_be_eaten)
-		// 	args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
-		// pthread_mutex_unlock(&args->sim_params->finished_mutex);
-		// pthread_mutex_unlock(&args->philo->meal_mutex);
-
 		pthread_mutex_lock(&args->philo->meal_mutex);
 		if (args->philo->meals_to_eat 
 			&& (current_timestamp(args->sim_params->start_time)

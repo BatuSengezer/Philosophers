@@ -57,7 +57,6 @@ typedef struct s_philosopher
 	pthread_mutex_t			*fork_right;
 	pthread_mutex_t			*fork_left;
 	long long				last_meal_timestamp;
-	int						meals_eaten;
 	int						meals_to_eat;
 	t_death_state			death_state;
 
@@ -73,7 +72,7 @@ typedef struct s_simulation_parameters
 	int						time_to_eat;
 	int						time_to_sleep;
 	struct timeval			start_time;
-	int						number_of_times_each_philo_must_eat;
+	int						meals_to_eat_each;
 	int						total_meals_to_be_eaten;
 	int						total_meals_eaten;
 	t_hunger_check			hunger_check;
@@ -98,7 +97,10 @@ typedef struct s_philosopher_args
 void		allocate(t_simulation_parameters *sim_params);
 void		init_sim_param(t_simulation_parameters *sim_params,
 				int argc, char **argv);
-void		init_philosophers_and_forks(t_simulation_parameters *sim_params);
+void		init_mutexes(t_simulation_parameters *sim_params);
+void		init_philos(t_simulation_parameters *sim_params);
+void		init_args(t_simulation_parameters *sim_params);
+
 
 //simulation functions
 
