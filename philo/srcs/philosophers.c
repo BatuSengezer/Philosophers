@@ -52,14 +52,16 @@ void	*eat_sleep_think(void *arg)
 	pthread_mutex_lock(&args->sim_params->death_mutex);
 	pthread_mutex_lock(&args->sim_params->finished_mutex);
 	while (args->philo->death_state == EVERYONE_ALIVE 
-		&& args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL
-		&& args->philo->meals_to_eat)
+		&& (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL
+		|| args->philo->meals_to_eat))
 	{
 		pthread_mutex_unlock(&args->sim_params->finished_mutex);
 		pthread_mutex_unlock(&args->sim_params->death_mutex);
 		pthread_mutex_lock(&args->sim_params->finished_mutex);
 		if (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL
-			&& args->philo->meals_to_eat)
+			|| args->philo->meals_to_eat)
+		// if (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL)
+		// if (args->philo->meals_to_eat)
 		{
 			pthread_mutex_unlock(&args->sim_params->finished_mutex);
 			eat(args);
@@ -68,6 +70,7 @@ void	*eat_sleep_think(void *arg)
 			{
 				pthread_mutex_unlock(&args->sim_params->finished_mutex);
 				print_state(args, SLEEPING);
+				// printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				return (NULL);
 			}
 			pthread_mutex_unlock(&args->sim_params->finished_mutex);
@@ -104,9 +107,11 @@ void	*monitor_death(void *arg)
 		if (args->philo->meals_to_eat
 			&& (current_timestamp(args->sim_params->start_time)
 				- args->philo->last_meal_timestamp
-				> args->sim_params->time_to_die))
+				> args->sim_params->time_to_die) && args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL)
 		{
-			// printf("!!!!!!!!!!!!!!");
+			// printf("%d total meals eaten\n", args->sim_params->total_meals_eaten);
+			// printf("%d meals to eat\n", args->philo->meals_to_eat);
+
 			print_state(args, DIED);
 			pthread_mutex_lock(&args->sim_params->death_mutex);
 			i = -1;
@@ -116,7 +121,7 @@ void	*monitor_death(void *arg)
 			pthread_mutex_unlock(&args->philo->meal_mutex);
 			return (NULL);
 		}
-		if (!args->philo->meals_to_eat)
+		if (!args->philo->meals_to_eat || args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
 			return (pthread_mutex_unlock(&args->philo->meal_mutex), NULL);
 		pthread_mutex_unlock(&args->philo->meal_mutex);
 		usleep(500);

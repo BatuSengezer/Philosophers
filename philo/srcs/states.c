@@ -25,6 +25,7 @@ void	print_state(t_philosopher_args *args, t_philosopher_state state)
 		printf("is sleeping\n");
 	else if (state == THINKING && args->philo->death_state == EVERYONE_ALIVE)
 		printf("is thinking\n");
+		// && args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL
 	else if (state == DIED && args->philo->death_state == EVERYONE_ALIVE)
 		printf("died\n");
 	else if (state == HAS_FORK && args->philo->death_state == EVERYONE_ALIVE)
@@ -37,14 +38,7 @@ void	print_state(t_philosopher_args *args, t_philosopher_state state)
 
 void	eat(t_philosopher_args	*args)
 {
-	pthread_mutex_lock(&args->sim_params->finished_mutex);
-	if (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL)
-	{
-		pthread_mutex_unlock(&args->sim_params->finished_mutex);
-		pick_up_forks(args);
-	}
-	else
-		pthread_mutex_unlock(&args->sim_params->finished_mutex);
+	pick_up_forks(args);
 	pthread_mutex_lock(&args->philo->meal_mutex);
 	args->philo->last_meal_timestamp = current_timestamp(
 			args->sim_params->start_time);
@@ -53,7 +47,7 @@ void	eat(t_philosopher_args	*args)
 		args->sim_params->total_meals_eaten++;
 		args->philo->meals_to_eat--;
 		pthread_mutex_lock(&args->sim_params->finished_mutex);
-		if (args->sim_params->total_meals_eaten == args->sim_params
+		if (args->sim_params->total_meals_eaten >= args->sim_params
 			->total_meals_to_be_eaten)
 			args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
 		pthread_mutex_unlock(&args->sim_params->finished_mutex);
