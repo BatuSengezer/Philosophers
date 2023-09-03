@@ -6,7 +6,7 @@
 /*   By: bsengeze <bsengeze@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 20:51:31 by bsengeze          #+#    #+#             */
-/*   Updated: 2023/09/02 18:24:55 by bsengeze         ###   ########.fr       */
+/*   Updated: 2023/09/03 14:49:01 by bsengeze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,9 @@ void	eat(t_philosopher_args	*args)
 			args->sim_params->start_time);
 	if (args->sim_params->hunger_check == ON)
 	{
+		pthread_mutex_lock(&args->sim_params->finished_mutex);
 		args->sim_params->total_meals_eaten++;
 		args->philo->meals_to_eat--;
-		pthread_mutex_lock(&args->sim_params->finished_mutex);
 		if (args->sim_params->total_meals_eaten >= args->sim_params
 			->total_meals_to_be_eaten)
 			args->sim_params->hunger_state = PHILOSOPHERS_ARE_FULL;
