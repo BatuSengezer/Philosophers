@@ -25,7 +25,6 @@ void	print_state(t_philosopher_args *args, t_philosopher_state state)
 		printf("is sleeping\n");
 	else if (state == THINKING && args->philo->death_state == EVERYONE_ALIVE)
 		printf("is thinking\n");
-		// && args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL
 	else if (state == DIED && args->philo->death_state == EVERYONE_ALIVE)
 		printf("died\n");
 	else if (state == HAS_FORK && args->philo->death_state == EVERYONE_ALIVE)

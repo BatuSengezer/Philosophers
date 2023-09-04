@@ -12,7 +12,6 @@
 
 #include "philosophers.h"
 
-// add proper exit
 void	print_exit(char *str)
 {
 	printf("%s\n", str);
@@ -28,8 +27,8 @@ void	destroy_free(t_simulation_parameters *sim_params)
 	if (pthread_mutex_destroy(&sim_params->finished_mutex))
 		print_exit("Error: pthread_mutex_destroy failed\n ");
 	if (pthread_mutex_destroy(&sim_params->death_mutex))
-		print_exit("Error: pthread_mutex_destroy failed\n ");	
-	i = -1;	
+		print_exit("Error: pthread_mutex_destroy failed\n ");
+	i = -1;
 	while (++i < sim_params->number_of_philos)
 	{
 		if (pthread_mutex_destroy(&sim_params->forks[i]))
@@ -55,9 +54,6 @@ long long	current_timestamp(struct timeval start_time)
 
 void	handle_single_philosopher_case(t_philosopher_args *args)
 {
-	printf("%lld %d has taken a fork\n",
-		current_timestamp(args->sim_params->start_time), args->philo->id);
+	print_state(args, HAS_FORK);
 	usleep(args->sim_params->time_to_die * 1000);
-	printf("%lld %d died\n", current_timestamp(args->sim_params->start_time),
-		args->philo->id);
 }

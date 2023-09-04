@@ -103,6 +103,7 @@ void		init_args(t_simulation_parameters *sim_params);
 //simulation functions
 
 void		*monitor_death(void *arg);
+void		case_death(t_philosopher_args *args);
 void		simulation(t_simulation_parameters *sim_params);
 void		print_state(t_philosopher_args *args, t_philosopher_state state);
 void		pick_up_forks(t_philosopher_args *args);
