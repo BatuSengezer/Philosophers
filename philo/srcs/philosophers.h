@@ -108,7 +108,8 @@ void		simulation(t_simulation_parameters *sim_params);
 void		print_state(t_philosopher_args *args, t_philosopher_state state);
 void		pick_up_forks(t_philosopher_args *args);
 void		drop_forks(t_philosopher_args *args);
-void		eat(t_philosopher_args	*args);
+int			eat_routine(t_philosopher_args	*args);
+void		sleep_routine(t_philosopher_args *args);
 void		*eat_sleep_think(void *arg);
 
 //util functions
@@ -119,5 +120,7 @@ void		handle_single_philosopher_case(t_philosopher_args *args);
 long long	ft_atoi(const char *nptr);
 void		print_exit(char *str);
 void		destroy_free(t_simulation_parameters *sim_params);
+void		death_and_finished_lock(t_philosopher_args *args);
+void		death_and_finished_unlock(t_philosopher_args *args);
 
 #endif

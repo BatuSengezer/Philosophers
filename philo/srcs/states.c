@@ -35,7 +35,7 @@ void	print_state(t_philosopher_args *args, t_philosopher_state state)
 	pthread_mutex_unlock(&args->sim_params->death_mutex);
 }
 
-void	eat(t_philosopher_args	*args)
+int	eat_routine(t_philosopher_args	*args)
 {
 	pick_up_forks(args);
 	pthread_mutex_lock(&args->philo->meal_mutex);
@@ -55,4 +55,24 @@ void	eat(t_philosopher_args	*args)
 	print_state(args, EATING);
 	usleep(args->sim_params->time_to_eat * 1000);
 	drop_forks(args);
+	pthread_mutex_lock(&args->sim_params->finished_mutex);
+	if (args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
+	{
+		pthread_mutex_unlock(&args->sim_params->finished_mutex);
+		return (print_state(args, SLEEPING), 0);
+	}
+	return (1);
+}
+
+void	sleep_routine(t_philosopher_args *args)
+{
+	pthread_mutex_lock(&args->sim_params->finished_mutex);
+	if (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL)
+	{
+		pthread_mutex_unlock(&args->sim_params->finished_mutex);
+		print_state(args, SLEEPING);
+		usleep(args->sim_params->time_to_sleep * 1000);
+	}
+	else
+		pthread_mutex_unlock(&args->sim_params->finished_mutex);
 }

@@ -44,49 +44,27 @@ void	*eat_sleep_think(void *arg)
 
 	args = (t_philosopher_args *)arg;
 	if (args->sim_params->number_of_philos == 1)
-		return(handle_single_philosopher_case(args), NULL);
+		return (handle_single_philosopher_case(args), NULL);
 	print_state(args, THINKING);
-	pthread_mutex_lock(&args->sim_params->death_mutex);
-	pthread_mutex_lock(&args->sim_params->finished_mutex);
+	death_and_finished_lock(args);
 	while (args->philo->death_state == EVERYONE_ALIVE 
 		&& (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL
 			|| args->philo->meals_to_eat))
 	{
-		pthread_mutex_unlock(&args->sim_params->finished_mutex);
 		pthread_mutex_unlock(&args->sim_params->death_mutex);
-		pthread_mutex_lock(&args->sim_params->finished_mutex);
 		if (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL
 			|| args->philo->meals_to_eat)
 		{
 			pthread_mutex_unlock(&args->sim_params->finished_mutex);
-			eat(args);
-			pthread_mutex_lock(&args->sim_params->finished_mutex);
-			if (args->sim_params->hunger_state == PHILOSOPHERS_ARE_FULL)
-			{
-				pthread_mutex_unlock(&args->sim_params->finished_mutex);
-				print_state(args, SLEEPING);
+			if (!eat_routine(args))
 				return (NULL);
-			}
-			pthread_mutex_unlock(&args->sim_params->finished_mutex);
 		}
-		else
-			pthread_mutex_unlock(&args->sim_params->finished_mutex);
-		pthread_mutex_lock(&args->sim_params->finished_mutex);
-		if (args->sim_params->hunger_state != PHILOSOPHERS_ARE_FULL)
-		{
-			pthread_mutex_unlock(&args->sim_params->finished_mutex);
-			print_state(args, SLEEPING);
-			usleep(args->sim_params->time_to_sleep * 1000);
-		}
-		else
-			pthread_mutex_unlock(&args->sim_params->finished_mutex);
+		pthread_mutex_unlock(&args->sim_params->finished_mutex);
+		sleep_routine(args);
 		print_state(args, THINKING);
-		pthread_mutex_lock(&args->sim_params->death_mutex);
-		pthread_mutex_lock(&args->sim_params->finished_mutex);
+		death_and_finished_lock(args);
 	}
-	pthread_mutex_unlock(&args->sim_params->finished_mutex);
-	pthread_mutex_unlock(&args->sim_params->death_mutex);
-	return (NULL);
+	return (death_and_finished_unlock(args), NULL);
 }
 
 void	*monitor_death(void *arg)

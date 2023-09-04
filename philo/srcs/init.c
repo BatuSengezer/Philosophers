@@ -31,6 +31,7 @@ void	init_sim_param(t_simulation_parameters *sim_params,
 	sim_params->time_to_die = ft_atoi(argv[2]);
 	sim_params->time_to_eat = ft_atoi(argv[3]);
 	sim_params->time_to_sleep = ft_atoi(argv[4]);
+	sim_params->total_meals_eaten = 0;
 	sim_params->total_meals_to_be_eaten = sim_params->number_of_philos
 		* sim_params->meals_to_eat_each;
 	gettimeofday(&sim_params->start_time, NULL);
